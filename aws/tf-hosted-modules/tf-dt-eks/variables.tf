@@ -52,7 +52,6 @@ variable "vpc_id" {
 variable "vpc_cidr_block" {
   description = "The CIDR block of the VPC"
   type        = string
-  default     = null
 }
 
 variable "private_subnet_ids" {
