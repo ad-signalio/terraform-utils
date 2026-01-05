@@ -11,7 +11,8 @@ resource "random_password" "db_password" {
 }
 
 module "db" {
-  source = "terraform-aws-modules/rds/aws"
+  source  = "terraform-aws-modules/rds/aws"
+  version = "~> 6.0" # 7.0 dropped support for the password variable we use below, so pinning to 6.x for now
 
   identifier = var.env_name
 
@@ -21,6 +22,7 @@ module "db" {
   allocated_storage     = var.allocated_storage
   max_allocated_storage = var.max_allocated_storage
 
+  # match is a reserved database name for RDS Postgres
   db_name  = "matchdb"
   username = "matchdb"
   port     = "5432"
@@ -45,6 +47,9 @@ module "db" {
   monitoring_role_name                  = "${var.env_name}-rds-monitor"
   create_monitoring_role                = var.enhanced_monitoring_interval > 0 ? true : false
 
+  # It would require 2x terraform runs to turn of password rotation by setting manage_master_user_password_rotation to false as it
+  # can't be disable on initial rotation. As we don't have a mechanism to co-ordinate automatic rotation with the app side,
+  # setting the password manually here.
   manage_master_user_password          = false
   password                             = random_password.db_password.result
   manage_master_user_password_rotation = false
@@ -77,6 +82,7 @@ module "db" {
   ], var.parameters)
 }
 
+// TODO: Delete this resource in future cleanup
 resource "kubernetes_secret" "db_credentials" {
   metadata {
     name      = "${var.env_name}-rds-pg"
