@@ -65,9 +65,9 @@ resource "aws_iam_policy" "deployment_policy" {
           "secretsmanager:DescribeSecret"
         ]
         Resource = [
-          "arn:*:secretsmanager:*:*:secret:${var.secret_naming_convention}*",
-          "arn:*:secretsmanager:*:*:secret:match-docker-secret*",
-          "arn:*:secretsmanager:*:*:secret:match-honeybadger-secret*"
+          "arn:aws:secretsmanager:*:*:secret:${var.secret_naming_convention}*",
+          "arn:aws:secretsmanager:*:*:secret:match-docker-secret*",
+          "arn:aws:secretsmanager:*:*:secret:match-honeybadger-secret*",
         ]
       }
     ]
