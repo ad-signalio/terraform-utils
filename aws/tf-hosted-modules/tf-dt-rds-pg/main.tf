@@ -82,24 +82,6 @@ module "db" {
   ], var.parameters)
 }
 
-// TODO: Delete this resource in future cleanup
-resource "kubernetes_secret" "db_credentials" {
-  metadata {
-    name      = "${var.env_name}-rds-pg"
-    namespace = var.k8s_namespace
-  }
-
-  data = {
-    username = module.db.db_instance_username
-    password = random_password.db_password.result
-    host     = module.db.db_instance_address
-    port     = module.db.db_instance_port
-    db_name  = module.db.db_instance_name
-  }
-
-  type = "Opaque"
-}
-
 resource "aws_secretsmanager_secret" "rds_pg" {
   count       = var.create_aws_secret ? 1 : 0
   name_prefix = "${var.secret_naming_convention}-rds-pg"
