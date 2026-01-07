@@ -99,11 +99,6 @@ variable "parameters" {
   default = []
 }
 
-variable "k8s_namespace" {
-  description = "The Kubernetes namespace to create the secret in"
-  type        = string
-}
-
 variable "deletion_protection" {
   description = "Whether to allow the RDS instance to be destroyed"
   type        = bool

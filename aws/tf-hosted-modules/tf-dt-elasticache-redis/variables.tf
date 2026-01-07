@@ -24,12 +24,6 @@ variable "vpc" {
   type        = any
 }
 
-variable "k8s_namespace" {
-  description = "The Kubernetes namespace to deploy resources into"
-  type        = string
-  default     = "match"
-}
-
 variable "cidr_block" {
   description = "The CIDR block for the VPC"
   type        = string

@@ -48,19 +48,6 @@ module "elasticache_redis" {
   tags = var.tags
 
 }
-resource "kubernetes_config_map" "redis_endpoint" {
-  metadata {
-    name      = "${var.env_name}-redis"
-    namespace = var.k8s_namespace
-  }
-
-  data = {
-    endpoint        = module.elasticache_redis.replication_group_primary_endpoint_address
-    url             = "redis://${module.elasticache_redis.replication_group_primary_endpoint_address}/6379/0"
-    elasticache_url = "redis://${module.elasticache_redis.replication_group_primary_endpoint_address}:6379"
-  }
-}
-
 
 resource "aws_secretsmanager_secret" "redis_url" {
   count       = var.create_aws_secret ? 1 : 0
@@ -78,7 +65,7 @@ resource "aws_secretsmanager_secret_version" "redis_url_version" {
   secret_string = jsonencode({
     endpoint        = "${module.elasticache_redis.replication_group_primary_endpoint_address}"
     url             = "redis://${module.elasticache_redis.replication_group_primary_endpoint_address}/6379/0"
-    elasticache_url = "redis://${module.elasticache_redis.replication_group_primary_endpoint_address}:6379"
+    elasticache_url = "rediss://${module.elasticache_redis.replication_group_primary_endpoint_address}:6379"
   })
 }
 
