@@ -45,12 +45,3 @@ variable "node_security_group_id" {
   type        = string
 }
 
-variable "storage_shared_storage_claim_name" {
-  type        = string
-  description = "Name of the storage claim"
-}
-
-variable "storage_shared_storage_size" {
-  type        = string
-  description = "Size of the shared storage"
-}
