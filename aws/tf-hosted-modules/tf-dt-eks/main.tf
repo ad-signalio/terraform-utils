@@ -10,7 +10,7 @@ module "eks_al2023_cluster" {
   version = "~> 21.1.5"
 
   name               = local.name
-  kubernetes_version = "1.33"
+  kubernetes_version = "1.34"
 
   endpoint_private_access                = true
   endpoint_public_access                 = true
@@ -36,6 +36,9 @@ module "eks_al2023_cluster" {
     aws-efs-csi-driver = {
       service_account_role_arn = module.efs_csi_irsa.arn
     }
+
+    metrics-server = {}
+
   }
 
   vpc_id                   = var.vpc_id
@@ -62,9 +65,9 @@ module "eks_al2023_cluster" {
       }
 
       launch_template_tags = var.tags
-
-      min_size = var.node_count
-      max_size = var.node_count
+      tag_specifications   = ["instance", "volume", "network-interface"]
+      min_size             = var.node_count
+      max_size             = var.node_count
       # This value is ignored after the initial creation
       # https://github.com/bryantbiggs/eks-desired-size-hack
       desired_size = var.node_count
