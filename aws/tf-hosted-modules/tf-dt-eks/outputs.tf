@@ -41,3 +41,8 @@ output "eks_cluster_name" {
   description = "The name of the EKS cluster"
   value       = module.eks_al2023_cluster.cluster_name
 }
+
+output "secrets_csi_irsa_role_arn" {
+  description = "The ARN of the IAM Role for the Secrets CSI Driver"
+  value       = module.secrets_csi_irsa.arn
+}
