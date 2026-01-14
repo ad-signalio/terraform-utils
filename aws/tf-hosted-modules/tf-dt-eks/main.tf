@@ -36,14 +36,29 @@ module "eks_al2023_cluster" {
     aws-efs-csi-driver = {
       service_account_role_arn = module.efs_csi_irsa.arn
     }
+    aws-secrets-store-csi-driver-provider = {
+      service_account_role_arn = module.secrets_csi_irsa.arn
+      namespace                = "kube-system"
+      configuration_values = jsonencode({
+        secrets-store-csi-driver = {
+          enableSecretRotation = true
+          rotationPollInterval = "3600s"
+          syncSecret = {
+            enabled = true
+          }
+        }
+      })
+    }
+
 
     metrics-server = {}
 
   }
 
-  vpc_id                   = var.vpc_id
-  subnet_ids               = var.private_subnet_ids
-  iam_role_use_name_prefix = var.iam_role_use_name_prefix
+  vpc_id                          = var.vpc_id
+  subnet_ids                      = var.private_subnet_ids
+  iam_role_use_name_prefix        = var.iam_role_use_name_prefix
+  include_oidc_root_ca_thumbprint = false
 
   eks_managed_node_groups = {
     default = {

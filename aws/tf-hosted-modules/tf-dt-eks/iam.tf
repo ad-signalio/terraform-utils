@@ -42,3 +42,29 @@ module "ebs_csi_irsa" {
   }
   tags = var.tags
 }
+
+
+module "secrets_csi_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "~> 6.2.1"
+
+  attach_external_secrets_policy = true
+  external_secrets_secrets_manager_arns = [
+    "arn:aws:secretsmanager:*:*:secret:${var.secret_naming_convention}*",
+    "arn:aws:secretsmanager:*:*:secret:match-docker-secret*",
+    "arn:aws:secretsmanager:*:*:secret:match-honeybadger-secret*",
+  ]
+
+
+  name            = "${var.env_name}-match-secrets-role"
+  use_name_prefix = false
+
+  oidc_providers = {
+    main = {
+      provider_arn = local.oidc_provider_arn
+      # this must match the service account that exists in the cluster
+      namespace_service_accounts = ["match:secret-sync-sa"]
+    }
+  }
+  tags = var.tags
+}

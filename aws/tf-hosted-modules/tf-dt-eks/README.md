@@ -19,6 +19,7 @@
 | <a name="module_ebs_csi_irsa"></a> [ebs\_csi\_irsa](#module\_ebs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 | <a name="module_efs_csi_irsa"></a> [efs\_csi\_irsa](#module\_efs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 | <a name="module_eks_al2023_cluster"></a> [eks\_al2023\_cluster](#module\_eks\_al2023\_cluster) | terraform-aws-modules/eks/aws | ~> 21.1.5 |
+| <a name="module_secrets_csi_irsa"></a> [secrets\_csi\_irsa](#module\_secrets\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 
 ## Resources
 
@@ -41,6 +42,7 @@
 | <a name="input_node_count"></a> [node\_count](#input\_node\_count) | Number of compute nodes for the EKS cluster | `number` | n/a | yes |
 | <a name="input_node_instance_type"></a> [node\_instance\_type](#input\_node\_instance\_type) | Instance type for EKS compute nodes | `string` | n/a | yes |
 | <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | A list of private subnet IDs for the EKS cluster | `list(string)` | n/a | yes |
+| <a name="input_secret_naming_convention"></a> [secret\_naming\_convention](#input\_secret\_naming\_convention) | Naming convention for secrets to be accessed by the service account. This should correspond to the naming convention used in secrets manager. | `string` | `""` | no |
 | <a name="input_subnets_in_az"></a> [subnets\_in\_az](#input\_subnets\_in\_az) | A list of subnet IDs in the specified availability zone | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | `{}` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block of the VPC | `string` | n/a | yes |
@@ -59,4 +61,5 @@
 | <a name="output_eks_cluster_node_sg"></a> [eks\_cluster\_node\_sg](#output\_eks\_cluster\_node\_sg) | The security group ID for the EKS cluster nodes |
 | <a name="output_eks_cluster_token"></a> [eks\_cluster\_token](#output\_eks\_cluster\_token) | The token to authenticate to the EKS cluster |
 | <a name="output_eks_oidc_arn"></a> [eks\_oidc\_arn](#output\_eks\_oidc\_arn) | The ARN of the OIDC Provider |
+| <a name="output_secrets_csi_irsa_role_arn"></a> [secrets\_csi\_irsa\_role\_arn](#output\_secrets\_csi\_irsa\_role\_arn) | The ARN of the IAM Role for the Secrets CSI Driver |
 <!-- END_TF_DOCS -->

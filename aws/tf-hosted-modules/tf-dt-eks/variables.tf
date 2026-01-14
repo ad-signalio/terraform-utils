@@ -63,3 +63,9 @@ variable "subnets_in_az" {
   description = "A list of subnet IDs in the specified availability zone"
   type        = list(string)
 }
+
+variable "secret_naming_convention" {
+  description = "Naming convention for secrets to be accessed by the service account. This should correspond to the naming convention used in secrets manager."
+  type        = string
+  default     = ""
+}
