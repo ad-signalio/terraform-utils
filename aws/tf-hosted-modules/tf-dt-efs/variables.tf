@@ -45,3 +45,8 @@ variable "node_security_group_id" {
   type        = string
 }
 
+variable "appuser_id" {
+  description = "The user ID for the application user."
+  type        = string
+  default     = "65532"
+}
