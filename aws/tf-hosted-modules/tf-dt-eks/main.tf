@@ -7,16 +7,22 @@ locals {
 
 module "eks_al2023_cluster" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 21.1.5"
+  version = "~> 21.15.1"
 
   name               = local.name
   kubernetes_version = "1.34"
 
-  endpoint_private_access                = true
-  endpoint_public_access                 = true
-  ip_family                              = "ipv4"
-  enabled_log_types                      = ["api", "audit", "authenticator", "scheduler"]
-  cloudwatch_log_group_retention_in_days = 30
+  endpoint_private_access                  = true
+  endpoint_public_access                   = true
+  ip_family                                = "ipv4"
+  enabled_log_types                        = ["api", "audit", "authenticator", "scheduler"]
+  cloudwatch_log_group_retention_in_days   = 30
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
+
+  compute_config = {
+    enabled = true
+  }
+
 
   # EKS Addons
   addons = {

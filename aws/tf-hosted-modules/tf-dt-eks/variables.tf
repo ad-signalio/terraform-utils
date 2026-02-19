@@ -69,3 +69,9 @@ variable "secret_naming_convention" {
   type        = string
   default     = ""
 }
+
+variable "enable_cluster_creator_admin_permissions" {
+  description = "Whether to automatically grant admin permissions to the cluster creator's IAM role. "
+  type        = bool
+  default     = true
+}
