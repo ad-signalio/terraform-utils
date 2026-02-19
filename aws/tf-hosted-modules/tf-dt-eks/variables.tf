@@ -69,3 +69,9 @@ variable "secret_naming_convention" {
   type        = string
   default     = ""
 }
+
+variable "enable_karpenter" {
+  description = "Flag to enable or disable Karpenter"
+  type        = bool
+  default     = false
+}
