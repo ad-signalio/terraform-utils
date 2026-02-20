@@ -69,3 +69,9 @@ variable "secret_naming_convention" {
   type        = string
   default     = ""
 }
+
+variable "kubernetes_version" {
+  description = "The Kubernetes version for the EKS cluster"
+  type        = string
+  default     = "1.34"
+}

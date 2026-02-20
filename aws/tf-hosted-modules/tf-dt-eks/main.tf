@@ -3,6 +3,41 @@ data "aws_region" "current" {}
 
 locals {
   name = var.env_name
+  eks_managed_node_groups = {
+    default = {
+      subnet_ids = var.subnets_in_az
+      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+      instance_types = [var.node_instance_type]
+      ami_type       = "AL2023_x86_64_STANDARD"
+
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 50
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = false
+          }
+        }
+      }
+
+      launch_template_tags = var.tags
+      tag_specifications   = ["instance", "volume", "network-interface"]
+      min_size             = var.node_count
+      max_size             = var.node_count
+      # This value is ignored after the initial creation
+      # https://github.com/bryantbiggs/eks-desired-size-hack
+      desired_size = var.node_count
+
+      iam_role_additional_policies = {
+        ssm = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
+      tags = var.tags
+    }
+  }
+
+
 }
 
 module "eks_al2023_cluster" {
@@ -10,7 +45,7 @@ module "eks_al2023_cluster" {
   version = "~> 21.15.1"
 
   name               = local.name
-  kubernetes_version = "1.34"
+  kubernetes_version = var.kubernetes_version
 
   endpoint_private_access                = true
   endpoint_public_access                 = true
@@ -18,8 +53,14 @@ module "eks_al2023_cluster" {
   enabled_log_types                      = ["api", "audit", "authenticator", "scheduler"]
   cloudwatch_log_group_retention_in_days = 30
 
+  create_auto_mode_iam_resources = true
   compute_config = {
-    enabled = true
+    enabled    = true
+    node_pools = ["generic"]
+  }
+
+  control_plane_scaling_config = {
+    tier = "standard"
   }
 
 
@@ -65,39 +106,7 @@ module "eks_al2023_cluster" {
   iam_role_use_name_prefix        = var.iam_role_use_name_prefix
   include_oidc_root_ca_thumbprint = false
 
-  eks_managed_node_groups = {
-    default = {
-      subnet_ids = var.subnets_in_az
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = [var.node_instance_type]
-      ami_type       = "AL2023_x86_64_STANDARD"
-
-      block_device_mappings = {
-        xvda = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 50
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = false
-          }
-        }
-      }
-
-      launch_template_tags = var.tags
-      tag_specifications   = ["instance", "volume", "network-interface"]
-      min_size             = var.node_count
-      max_size             = var.node_count
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = var.node_count
-
-      iam_role_additional_policies = {
-        ssm = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-      }
-      tags = var.tags
-    }
-  }
+  eks_managed_node_groups = local.eks_managed_node_groups
 
   access_entries = merge(
     local.infra_admin_roles,
