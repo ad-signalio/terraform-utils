@@ -18,7 +18,7 @@
 |------|--------|---------|
 | <a name="module_ebs_csi_irsa"></a> [ebs\_csi\_irsa](#module\_ebs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 | <a name="module_efs_csi_irsa"></a> [efs\_csi\_irsa](#module\_efs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
-| <a name="module_eks_al2023_cluster"></a> [eks\_al2023\_cluster](#module\_eks\_al2023\_cluster) | terraform-aws-modules/eks/aws | ~> 21.1.5 |
+| <a name="module_eks_al2023_cluster"></a> [eks\_al2023\_cluster](#module\_eks\_al2023\_cluster) | terraform-aws-modules/eks/aws | ~> 21.15.1 |
 | <a name="module_secrets_csi_irsa"></a> [secrets\_csi\_irsa](#module\_secrets\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 
 ## Resources
@@ -37,8 +37,9 @@
 | <a name="input_admin_access_role_names"></a> [admin\_access\_role\_names](#input\_admin\_access\_role\_names) | A list of IAM role names (NOT full ARNs) that exist in the account that will have admin access to the EKS cluster | `list(string)` | `[]` | no |
 | <a name="input_admin_access_sso_permission_set_names"></a> [admin\_access\_sso\_permission\_set\_names](#input\_admin\_access\_sso\_permission\_set\_names) | A list of AWS SSO permission set names (NOT full ARNs) that exist in the account that will have admin access to the EKS cluster eg 'Infra' | `list(string)` | `[]` | no |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
-| <a name="input_extra_access_entries"></a> [extra\_access\_entries](#input\_extra\_access\_entries) | Map of extra Cluster access entries. See terraform-aws-modules/eks/aws for details. | `map(any)` | `{}` | no |
+| <a name="input_extra_access_entries"></a> [extra\_access\_entries](#input\_extra\_access\_entries) | Map of extra Cluster access entries. See [terraform-aws-modules/eks/aws](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest#input_access_entries) for details.| `map(any)` | `{}` | no |
 | <a name="input_iam_role_use_name_prefix"></a> [iam\_role\_use\_name\_prefix](#input\_iam\_role\_use\_name\_prefix) | Determines whether the IAM role name (`iam_role_name`) is used as a prefix | `bool` | `true` | no |
+| <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | The Kubernetes version for the EKS cluster | `string` | `"1.34"` | no |
 | <a name="input_node_count"></a> [node\_count](#input\_node\_count) | Number of compute nodes for the EKS cluster | `number` | n/a | yes |
 | <a name="input_node_instance_type"></a> [node\_instance\_type](#input\_node\_instance\_type) | Instance type for EKS compute nodes | `string` | n/a | yes |
 | <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | A list of private subnet IDs for the EKS cluster | `list(string)` | n/a | yes |
