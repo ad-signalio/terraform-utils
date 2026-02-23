@@ -69,3 +69,15 @@ variable "secret_naming_convention" {
   type        = string
   default     = ""
 }
+
+variable "kubernetes_version" {
+  description = "The Kubernetes version for the EKS cluster"
+  type        = string
+  default     = "1.34"
+}
+
+variable "use_auto_mode" {
+  description = "Choose to use, EKS Auto Mode. Default is true. If false, `node_count` and `node_instance_type` variables will be used to create a managed node group with specified count and instance type."
+  type        = bool
+  default     = true
+}

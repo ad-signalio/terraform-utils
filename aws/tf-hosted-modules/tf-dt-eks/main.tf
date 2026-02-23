@@ -3,7 +3,7 @@ data "aws_region" "current" {}
 
 locals {
   name = var.env_name
-  eks_managed_node_groups = {
+  eks_managed_node_groups = var.use_auto_mode ? null : {
     default = {
       subnet_ids = var.subnets_in_az
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
@@ -35,6 +35,15 @@ locals {
       }
       tags = var.tags
     }
+  }
+  # Due to the current EKS Auto Mode API, to disable EKS Auto Mode 
+  # you will have to explicity set: false
+  compute_config = var.use_auto_mode ? {
+    enabled    = var.use_auto_mode
+    node_pools = ["system", "general-purpose"]
+    } : {
+    enabled    = false
+    node_pools = []
   }
 
 
