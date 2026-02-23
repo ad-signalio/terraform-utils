@@ -10,7 +10,6 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 | <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 3.0 |
 
 ## Modules
@@ -23,7 +22,6 @@ No modules.
 |------|------|
 | [kubernetes_ingress_class_v1.match_alb](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/ingress_class_v1) | resource |
 | [kubernetes_manifest.match_alb_ingress_class_params](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
-| [aws_eks_clusters.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_clusters) | data source |
 
 ## Inputs
 
@@ -31,7 +29,6 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_eks_cluster_certificate"></a> [eks\_cluster\_certificate](#input\_eks\_cluster\_certificate) | The base64 encoded certificate for the EKS cluster. | `string` | n/a | yes |
 | <a name="input_eks_cluster_endpoint"></a> [eks\_cluster\_endpoint](#input\_eks\_cluster\_endpoint) | The endpoint for the EKS cluster. | `string` | n/a | yes |
-| <a name="input_eks_cluster_name"></a> [eks\_cluster\_name](#input\_eks\_cluster\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
 | <a name="input_eks_cluster_token"></a> [eks\_cluster\_token](#input\_eks\_cluster\_token) | The authentication token for the EKS cluster. | `string` | n/a | yes |
 
 ## Outputs

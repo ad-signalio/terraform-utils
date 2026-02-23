@@ -3,63 +3,6 @@ data "aws_region" "current" {}
 
 locals {
   name = var.env_name
-}
-
-module "eks_al2023_cluster" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 21.1.5"
-
-  name               = local.name
-  kubernetes_version = "1.34"
-
-  endpoint_private_access                = true
-  endpoint_public_access                 = true
-  ip_family                              = "ipv4"
-  enabled_log_types                      = ["api", "audit", "authenticator", "scheduler"]
-  cloudwatch_log_group_retention_in_days = 30
-
-  # EKS Addons
-  addons = {
-    coredns = {}
-    eks-pod-identity-agent = {
-      before_compute = true
-    }
-    kube-proxy = {}
-    vpc-cni = {
-      before_compute              = true
-      resolve_conflicts_on_create = "OVERWRITE"
-      resolve_conflicts_on_update = "OVERWRITE"
-    }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_irsa.arn
-    }
-    aws-efs-csi-driver = {
-      service_account_role_arn = module.efs_csi_irsa.arn
-    }
-    aws-secrets-store-csi-driver-provider = {
-      service_account_role_arn = module.secrets_csi_irsa.arn
-      namespace                = "kube-system"
-      configuration_values = jsonencode({
-        secrets-store-csi-driver = {
-          enableSecretRotation = true
-          rotationPollInterval = "3600s"
-          syncSecret = {
-            enabled = true
-          }
-        }
-      })
-    }
-
-
-    metrics-server = {}
-
-  }
-
-  vpc_id                          = var.vpc_id
-  subnet_ids                      = var.private_subnet_ids
-  iam_role_use_name_prefix        = var.iam_role_use_name_prefix
-  include_oidc_root_ca_thumbprint = false
-
   eks_managed_node_groups = {
     default = {
       subnet_ids = var.subnets_in_az
@@ -93,6 +36,75 @@ module "eks_al2023_cluster" {
       tags = var.tags
     }
   }
+
+
+}
+
+module "eks_al2023_cluster" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 21.15.1"
+
+  name               = local.name
+  kubernetes_version = var.kubernetes_version
+
+  endpoint_private_access                = true
+  endpoint_public_access                 = true
+  ip_family                              = "ipv4"
+  enabled_log_types                      = ["api", "audit", "authenticator", "scheduler"]
+  cloudwatch_log_group_retention_in_days = 30
+
+  create_auto_mode_iam_resources = true
+  compute_config = {
+    enabled    = true
+    node_pools = ["system", "general-purpose"]
+  }
+
+  control_plane_scaling_config = {
+    tier = "standard"
+  }
+
+  # EKS Addons
+  addons = {
+    coredns = {}
+    eks-pod-identity-agent = {
+      before_compute = true
+    }
+    kube-proxy = {}
+    vpc-cni = {
+      before_compute              = true
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+    aws-ebs-csi-driver = {
+      service_account_role_arn = module.ebs_csi_irsa.arn
+    }
+    aws-efs-csi-driver = {
+      service_account_role_arn = module.efs_csi_irsa.arn
+    }
+    aws-secrets-store-csi-driver-provider = {
+      service_account_role_arn = module.secrets_csi_irsa.arn
+      namespace                = "kube-system"
+      configuration_values = jsonencode({
+        secrets-store-csi-driver = {
+          enableSecretRotation = true
+          rotationPollInterval = "3600s"
+          syncSecret = {
+            enabled = true
+          }
+        }
+      })
+    }
+
+    metrics-server = {}
+
+  }
+
+  vpc_id                          = var.vpc_id
+  subnet_ids                      = var.private_subnet_ids
+  iam_role_use_name_prefix        = var.iam_role_use_name_prefix
+  include_oidc_root_ca_thumbprint = false
+
+  eks_managed_node_groups = local.eks_managed_node_groups
 
   access_entries = merge(
     local.infra_admin_roles,
