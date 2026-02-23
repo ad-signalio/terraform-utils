@@ -1,35 +1,3 @@
-data "aws_caller_identity" "current" {}
-
-## i dont like it
-
-
-resource "kubernetes_cluster_role" "ingressclass_admin" {
-  metadata {
-    name = "ingressclass-admin"
-  }
-  rule {
-    api_groups = ["networking.k8s.io"]
-    resources  = ["ingressclasses"]
-    verbs      = ["create", "get", "list", "watch", "update", "delete"]
-  }
-}
-
-resource "kubernetes_cluster_role_binding" "ingressclass_admin_binding" {
-  metadata {
-    name = "ingressclass-admin-binding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.ingressclass_admin.metadata[0].name
-  }
-  subject {
-    kind      = "User"
-    name      = data.aws_caller_identity.current.arn
-    api_group = "rbac.authorization.k8s.io"
-  }
-}
-
 resource "kubernetes_ingress_class_v1" "match_alb" {
   metadata {
     name = "match-alb"
