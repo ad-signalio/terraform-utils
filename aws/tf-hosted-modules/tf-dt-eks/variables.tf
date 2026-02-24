@@ -6,11 +6,13 @@ variable "env_name" {
 variable "node_count" {
   description = "Number of compute nodes for the EKS cluster"
   type        = number
+  default     = 1
 }
 
 variable "node_instance_type" {
   description = "Instance type for EKS compute nodes"
   type        = string
+  default     = "t3.2xlarge"
 }
 
 variable "admin_access_sso_permission_set_names" {
