@@ -1,6 +1,6 @@
-resource "kubernetes_storage_class_v1" "gp2" {
+resource "kubernetes_storage_class_v1" "auto_ebs_gp2" {
   metadata {
-    name = "gp2"
+    name = "auto-ebs-gp2"
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
