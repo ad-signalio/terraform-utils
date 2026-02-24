@@ -26,6 +26,7 @@ module "efs_csi_irsa" {
 }
 
 module "ebs_csi_irsa" {
+  count   = var.use_auto_mode ? 0 : 1
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "~> 6.2.1"
 

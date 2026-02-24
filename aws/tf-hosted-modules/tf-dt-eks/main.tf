@@ -3,7 +3,7 @@ data "aws_region" "current" {}
 
 locals {
   name = var.env_name
-  eks_managed_node_groups = {
+  eks_managed_node_groups = var.use_auto_mode ? null : {
     default = {
       subnet_ids = var.subnets_in_az
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
@@ -35,6 +35,25 @@ locals {
       }
       tags = var.tags
     }
+  }
+  # Due to the current EKS Auto Mode API, to disable EKS Auto Mode 
+  # you will have to explicity set: false
+  compute_config = var.use_auto_mode ? {
+    enabled    = var.use_auto_mode
+    node_pools = ["system", "general-purpose"]
+    } : {
+    enabled    = false
+    node_pools = []
+  }
+
+  # auto mode handles ebs and vpc cni
+  vpc_cni = var.use_auto_mode ? {} : {
+    before_compute              = true
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "OVERWRITE"
+  }
+  ebs_csi = var.use_auto_mode ? {} : {
+    service_account_role_arn = module.ebs_csi_irsa.arn
   }
 
 
@@ -70,17 +89,11 @@ module "eks_al2023_cluster" {
       before_compute = true
     }
     kube-proxy = {}
-    vpc-cni = {
-      before_compute              = true
-      resolve_conflicts_on_create = "OVERWRITE"
-      resolve_conflicts_on_update = "OVERWRITE"
-    }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_irsa.arn
-    }
+    vpc-cni    = local.vpc_cni
     aws-efs-csi-driver = {
       service_account_role_arn = module.efs_csi_irsa.arn
     }
+    aws-ebs-csi-driver = local.ebs_csi
     aws-secrets-store-csi-driver-provider = {
       service_account_role_arn = module.secrets_csi_irsa.arn
       namespace                = "kube-system"
