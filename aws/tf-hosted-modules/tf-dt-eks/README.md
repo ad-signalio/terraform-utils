@@ -37,14 +37,16 @@
 | <a name="input_admin_access_role_names"></a> [admin\_access\_role\_names](#input\_admin\_access\_role\_names) | A list of IAM role names (NOT full ARNs) that exist in the account that will have admin access to the EKS cluster | `list(string)` | `[]` | no |
 | <a name="input_admin_access_sso_permission_set_names"></a> [admin\_access\_sso\_permission\_set\_names](#input\_admin\_access\_sso\_permission\_set\_names) | A list of AWS SSO permission set names (NOT full ARNs) that exist in the account that will have admin access to the EKS cluster eg 'Infra' | `list(string)` | `[]` | no |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
-| <a name="input_extra_access_entries"></a> [extra\_access\_entries](#input\_extra\_access\_entries) | Map of extra Cluster access entries. See  [terraform-aws-modules/eks/aws](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest#input_access_entries) for details. | `map(any)` | `{}` | no |
+| <a name="input_extra_access_entries"></a> [extra\_access\_entries](#input\_extra\_access\_entries) | Map of extra Cluster access entries. See terraform-aws-modules/eks/aws for details. | `map(any)` | `{}` | no |
 | <a name="input_iam_role_use_name_prefix"></a> [iam\_role\_use\_name\_prefix](#input\_iam\_role\_use\_name\_prefix) | Determines whether the IAM role name (`iam_role_name`) is used as a prefix | `bool` | `true` | no |
+| <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | The Kubernetes version for the EKS cluster | `string` | `"1.34"` | no |
 | <a name="input_node_count"></a> [node\_count](#input\_node\_count) | Number of compute nodes for the EKS cluster | `number` | n/a | yes |
 | <a name="input_node_instance_type"></a> [node\_instance\_type](#input\_node\_instance\_type) | Instance type for EKS compute nodes | `string` | n/a | yes |
 | <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | A list of private subnet IDs for the EKS cluster | `list(string)` | n/a | yes |
 | <a name="input_secret_naming_convention"></a> [secret\_naming\_convention](#input\_secret\_naming\_convention) | Naming convention for secrets to be accessed by the service account. This should correspond to the naming convention used in secrets manager. | `string` | `""` | no |
 | <a name="input_subnets_in_az"></a> [subnets\_in\_az](#input\_subnets\_in\_az) | A list of subnet IDs in the specified availability zone | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | `{}` | no |
+| <a name="input_use_auto_mode"></a> [use\_auto\_mode](#input\_use\_auto\_mode) | Choose to use, EKS Auto Mode. Default is true. If false, `node_count` and `node_instance_type` variables will be used to create a managed node group with specified count and instance type. | `bool` | `true` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block of the VPC | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC where the EKS cluster will be deployed | `string` | n/a | yes |
 
