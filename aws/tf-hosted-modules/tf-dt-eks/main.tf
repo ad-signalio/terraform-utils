@@ -66,8 +66,8 @@ locals {
       namespace                = "kube-system"
       configuration_values = jsonencode({
         secrets-store-csi-driver = {
-          enableSecretRotation   = true
-          rotationPollInterval   = "3600s"
+          enableSecretRotation = true
+          rotationPollInterval = "3600s"
           syncSecret = {
             enabled = true
           }
@@ -75,8 +75,8 @@ locals {
       })
     }
     metrics-server = {}
-  } : {
-    coredns = {}
+    } : {
+    coredns    = {}
     kube-proxy = {}
     eks-pod-identity-agent = {
       before_compute = true
@@ -95,8 +95,8 @@ locals {
       namespace                = "kube-system"
       configuration_values = jsonencode({
         secrets-store-csi-driver = {
-          enableSecretRotation   = true
-          rotationPollInterval   = "3600s"
+          enableSecretRotation = true
+          rotationPollInterval = "3600s"
           syncSecret = {
             enabled = true
           }
@@ -104,7 +104,7 @@ locals {
       })
     }
     metrics-server = {}
-  } 
+  }
 }
 
 module "eks_al2023_cluster" {
