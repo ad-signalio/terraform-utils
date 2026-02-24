@@ -56,7 +56,55 @@ locals {
     service_account_role_arn = module.ebs_csi_irsa.arn
   }
 
-
+  # auto mode handles ebs and vpc cni
+  add_ons = var.use_auto_mode ? {
+    aws-efs-csi-driver = {
+      service_account_role_arn = module.efs_csi_irsa.arn
+    }
+    aws-secrets-store-csi-driver-provider = {
+      service_account_role_arn = module.secrets_csi_irsa.arn
+      namespace                = "kube-system"
+      configuration_values = jsonencode({
+        secrets-store-csi-driver = {
+          enableSecretRotation   = true
+          rotationPollInterval   = "3600s"
+          syncSecret = {
+            enabled = true
+          }
+        }
+      })
+    }
+    metrics-server = {}
+  } : {
+    coredns = {}
+    kube-proxy = {}
+    eks-pod-identity-agent = {
+      before_compute = true
+    }
+    vpc-cni = {
+      before_compute              = true
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+    aws-efs-csi-driver = {
+      service_account_role_arn = module.efs_csi_irsa.arn
+    }
+    aws-ebs-csi-driver = {}
+    aws-secrets-store-csi-driver-provider = {
+      service_account_role_arn = module.secrets_csi_irsa.arn
+      namespace                = "kube-system"
+      configuration_values = jsonencode({
+        secrets-store-csi-driver = {
+          enableSecretRotation   = true
+          rotationPollInterval   = "3600s"
+          syncSecret = {
+            enabled = true
+          }
+        }
+      })
+    }
+    metrics-server = {}
+  } 
 }
 
 module "eks_al2023_cluster" {
@@ -83,34 +131,7 @@ module "eks_al2023_cluster" {
   }
 
   # EKS Addons
-  addons = {
-    coredns = {}
-    eks-pod-identity-agent = {
-      before_compute = true
-    }
-    kube-proxy = {}
-    vpc-cni    = local.vpc_cni
-    aws-efs-csi-driver = {
-      service_account_role_arn = module.efs_csi_irsa.arn
-    }
-    aws-ebs-csi-driver = local.ebs_csi
-    aws-secrets-store-csi-driver-provider = {
-      service_account_role_arn = module.secrets_csi_irsa.arn
-      namespace                = "kube-system"
-      configuration_values = jsonencode({
-        secrets-store-csi-driver = {
-          enableSecretRotation = true
-          rotationPollInterval = "3600s"
-          syncSecret = {
-            enabled = true
-          }
-        }
-      })
-    }
-
-    metrics-server = {}
-
-  }
+  addons = local.add_ons
 
   vpc_id                          = var.vpc_id
   subnet_ids                      = var.private_subnet_ids
