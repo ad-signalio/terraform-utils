@@ -38,12 +38,16 @@ resource "aws_ses_domain_mail_from" "custom_mail_from" {
   mail_from_domain = "${one(var.custom_from_subdomain)}.${join("", aws_ses_domain_identity.ses_domain[*].domain)}"
 }
 
+resource "aws_sesv2_email_identity" "allowed_to_send_email_to" {
+  email_identity = var.outgoing_email_address
+}
+
 resource "aws_route53_record" "custom_mail_from_mx" {
   zone_id = var.zone_id
   name    = join("", aws_ses_domain_mail_from.custom_mail_from[*].mail_from_domain)
   type    = "MX"
   ttl     = "600"
-  records = ["10 feedback-smtp.${join("", data.aws_region.current[*].name)}.amazonses.com"]
+  records = ["10 feedback-smtp.${join("", data.aws_region.current[*].region)}.amazonses.com"]
 }
 
 ## iam user for sending emails via SES
@@ -57,9 +61,13 @@ resource "aws_iam_user_policy_attachment" "ses_send_email" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }
 
-resource "random_password" "ses_smtp_password" {
-  length  = 32
-  special = true
+resource "aws_iam_access_key" "smtp_user" {
+  user = aws_iam_user.ses_user.name
+}
+
+resource "aws_iam_user_group_membership" "ses_user_group" {
+  user   = aws_iam_user.ses_user.name
+  groups = ["AWSSESSendingGroupDoNotRename"]
 }
 
 resource "aws_secretsmanager_secret" "ses_credentials" {
@@ -67,16 +75,20 @@ resource "aws_secretsmanager_secret" "ses_credentials" {
   tags = var.tags
 }
 
-
+locals {
+  domain              = join("", aws_ses_domain_identity.ses_domain[*].domain)
+  mailer_default_from = join("@", ["no-reply", local.domain])
+}
 
 resource "aws_secretsmanager_secret_version" "ses_credentials_version" {
   secret_id = aws_secretsmanager_secret.ses_credentials.id
   secret_string = jsonencode({
-    iam_user_name = aws_iam_user.ses_user.name
-    smtp_password = random_password.ses_smtp_password.result
-    smtp_port     = tostring(587)
-    smtp_domain   = join("", aws_ses_domain_identity.ses_domain[*].domain)
-    smtp_address  = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
+    smtp_user_name      = aws_iam_access_key.smtp_user.id
+    smtp_password       = aws_iam_access_key.smtp_user.ses_smtp_password_v4
+    smtp_port           = tostring(587)
+    smtp_domain         = local.domain
+    smtp_address        = "email-smtp.${data.aws_region.current.region}.amazonaws.com"
+    mailer_default_from = local.mailer_default_from
   })
 }
 
