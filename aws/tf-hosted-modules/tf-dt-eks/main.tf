@@ -46,6 +46,16 @@ locals {
     node_pools = []
   }
 
+  # auto mode handles ebs and vpc cni
+  vpc_cni = var.use_auto_mode ? {} : {
+    before_compute              = true
+    resolve_conflicts_on_create = "OVERWRITE"
+    resolve_conflicts_on_update = "OVERWRITE"
+  }
+  ebs_csi = var.use_auto_mode ? {} : {
+    service_account_role_arn = module.ebs_csi_irsa.arn
+  }
+
 
 }
 
@@ -79,17 +89,11 @@ module "eks_al2023_cluster" {
       before_compute = true
     }
     kube-proxy = {}
-    vpc-cni = {
-      before_compute              = true
-      resolve_conflicts_on_create = "OVERWRITE"
-      resolve_conflicts_on_update = "OVERWRITE"
-    }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_irsa.arn
-    }
+    vpc-cni    = local.vpc_cni
     aws-efs-csi-driver = {
       service_account_role_arn = module.efs_csi_irsa.arn
     }
+    aws-ebs-csi-driver = local.ebs_csi
     aws-secrets-store-csi-driver-provider = {
       service_account_role_arn = module.secrets_csi_irsa.arn
       namespace                = "kube-system"
