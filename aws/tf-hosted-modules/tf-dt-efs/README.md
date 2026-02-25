@@ -29,15 +29,16 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_appuser_id"></a> [appuser\_id](#input\_appuser\_id) | The user ID for the application user. | `string` | `"65532"` | no |
 | <a name="input_availability_zone_name"></a> [availability\_zone\_name](#input\_availability\_zone\_name) | For One Zone file systems, specify the AWS Availability Zone in which to create the file system. | `string` | `"us-east-1a"` | no |
 | <a name="input_cluster_name_prefix"></a> [cluster\_name\_prefix](#input\_cluster\_name\_prefix) | Cluster name and prefix for all the associated resources | `string` | n/a | yes |
 | <a name="input_eks_cluster_certificate"></a> [eks\_cluster\_certificate](#input\_eks\_cluster\_certificate) | The base64 encoded certificate for the EKS cluster. | `string` | n/a | yes |
 | <a name="input_eks_cluster_endpoint"></a> [eks\_cluster\_endpoint](#input\_eks\_cluster\_endpoint) | The endpoint for the EKS cluster. | `string` | n/a | yes |
 | <a name="input_eks_cluster_token"></a> [eks\_cluster\_token](#input\_eks\_cluster\_token) | The authentication token for the EKS cluster. | `string` | n/a | yes |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
-| <a name="input_node_security_group_id"></a> [node\_security\_group\_id](#input\_node\_security\_group\_id) | ID of the node shared security group | `string` | n/a | yes |
 | <a name="input_private_subnet"></a> [private\_subnet](#input\_private\_subnet) | Id of private subnet CIDR block, in the AZ zone specified | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | `{}` | no |
+| <a name="input_vpc_security_group_ids"></a> [vpc\_security\_group\_ids](#input\_vpc\_security\_group\_ids) | A list of VPC security group IDs to associate | `list(string)` | n/a | yes |
 
 ## Outputs
 

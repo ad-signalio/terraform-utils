@@ -14,5 +14,5 @@ resource "aws_efs_file_system" "eks" {
 resource "aws_efs_mount_target" "eks" {
   subnet_id       = var.private_subnet
   file_system_id  = aws_efs_file_system.eks.id
-  security_groups = [var.node_security_group_id]
+  security_groups = [var.vpc_security_group_ids]
 }
