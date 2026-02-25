@@ -40,9 +40,13 @@ variable "private_subnet" {
   type        = string
 }
 
-variable "node_security_group_id" {
-  description = "ID of the node shared security group"
-  type        = string
+variable "vpc_security_group_ids" {
+  description = "A list of VPC security group IDs to associate"
+  type        = list(string)
+  validation {
+    condition     = length(var.vpc_security_group_ids) <= 5
+    error_message = "You can specify up to 5 security group IDs."
+  }
 }
 
 variable "appuser_id" {
