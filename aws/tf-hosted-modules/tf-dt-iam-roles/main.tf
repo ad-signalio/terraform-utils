@@ -222,7 +222,8 @@ module "iam_assumable_role_with_oidc" {
     aws_iam_policy.sas_service_account_autoingest.arn,
   ]
 
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"]
+  oidc_fully_qualified_subjects  = ["system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"]
+  oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
 
   tags = var.tags
 }
