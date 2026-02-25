@@ -24,19 +24,46 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "private_subnets" {
+  description = "A list of all private subnets, containing the full objects."
+  type = list(object({
+    arn                                            = string
+    assign_ipv6_address_on_creation                = bool
+    availability_zone                              = string
+    availability_zone_id                           = string
+    cidr_block                                     = string
+    customer_owned_ipv4_pool                       = string
+    enable_dns64                                   = bool
+    enable_lni_at_device_index                     = number
+    enable_resource_name_dns_a_record_on_launch    = bool
+    enable_resource_name_dns_aaaa_record_on_launch = bool
+    id                                             = string
+    ipv4_ipam_pool_id                              = string
+    ipv4_netmask_length                            = number
+    ipv6_cidr_block                                = string
+    ipv6_cidr_block_association_id                 = string
+    ipv6_ipam_pool_id                              = string
+    ipv6_native                                    = bool
+    ipv6_netmask_length                            = number
+    map_customer_owned_ip_on_launch                = bool
+    map_public_ip_on_launch                        = bool
+    outpost_arn                                    = string
+    owner_id                                       = string
+    private_dns_hostname_type_on_launch            = string
+    region                                         = string
+    tags                                           = map(string)
+    tags_all                                       = map(string)
+    vpc_id                                         = string
+  }))
+}
+
 variable "availability_zone_name" {
-  description = "For One Zone file systems, specify the AWS Availability Zone in which to create the file system."
+  description = "For One Zone systems, specify the AWS Availability Zone in which to create the EKS cluster and EFS."
   type        = string
-  default     = "us-east-1a"
 }
 
 variable "cluster_name_prefix" {
   description = "Cluster name and prefix for all the associated resources"
-  type        = string
-}
-
-variable "private_subnet" {
-  description = "Id of private subnet CIDR block, in the AZ zone specified"
   type        = string
 }
 
