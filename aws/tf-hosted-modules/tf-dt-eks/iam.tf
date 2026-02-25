@@ -19,7 +19,7 @@ module "efs_csi_irsa" {
   oidc_providers = {
     main = {
       provider_arn               = local.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:efs-csi-controller-sa"]
+      namespace_service_accounts = ["kube-system:efs-csi-controller-sa", "kube-system:efs-csi-node-sa"]
     }
   }
   tags = var.tags
