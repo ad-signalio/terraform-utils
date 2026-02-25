@@ -57,11 +57,6 @@ variable "private_subnets" {
   }))
 }
 
-variable "availability_zone_name" {
-  description = "For One Zone systems, specify the AWS Availability Zone in which to create the EKS cluster and EFS."
-  type        = string
-}
-
 variable "cluster_name_prefix" {
   description = "Cluster name and prefix for all the associated resources"
   type        = string
