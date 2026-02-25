@@ -54,6 +54,8 @@
 
 | Name | Description |
 |------|-------------|
+| <a name="output_cluster_primary_security_group_id"></a> [cluster\_primary\_security\_group\_id](#output\_cluster\_primary\_security\_group\_id) | Cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control-plane-to-data-plane communication. Referred to as 'Cluster security group' in the EKS console |
+| <a name="output_cluster_security_group_id"></a> [cluster\_security\_group\_id](#output\_cluster\_security\_group\_id) | ID of the cluster security group |
 | <a name="output_eks_cluster"></a> [eks\_cluster](#output\_eks\_cluster) | n/a |
 | <a name="output_eks_cluster_auth"></a> [eks\_cluster\_auth](#output\_eks\_cluster\_auth) | n/a |
 | <a name="output_eks_cluster_certificate"></a> [eks\_cluster\_certificate](#output\_eks\_cluster\_certificate) | The certificate of the EKS cluster |

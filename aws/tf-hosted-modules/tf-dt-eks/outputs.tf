@@ -32,6 +32,16 @@ output "eks_cluster_node_sg" {
   value       = module.eks_al2023_cluster.node_security_group_id
 }
 
+output "cluster_primary_security_group_id" {
+  description = "Cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control-plane-to-data-plane communication. Referred to as 'Cluster security group' in the EKS console"
+  value       = module.eks_al2023_cluster.cluster_primary_security_group_id
+}
+
+output "cluster_security_group_id" {
+  description = "ID of the cluster security group"
+  value       = module.eks_al2023_cluster.cluster_security_group_id
+}
+
 output "eks_oidc_arn" {
   description = "The ARN of the OIDC Provider"
   value       = local.oidc_provider_arn
