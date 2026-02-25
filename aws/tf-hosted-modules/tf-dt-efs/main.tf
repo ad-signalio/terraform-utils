@@ -9,11 +9,10 @@ locals {
 }
 
 resource "aws_efs_file_system" "eks" {
-  creation_token         = "${var.cluster_name_prefix}-"
-  encrypted              = true
-  throughput_mode        = "elastic"
-  availability_zone_name = var.availability_zone_name
-  tags                   = merge(var.tags, { Name = var.cluster_name_prefix })
+  creation_token  = "${var.cluster_name_prefix}-"
+  encrypted       = true
+  throughput_mode = "elastic"
+  tags            = merge(var.tags, { Name = var.cluster_name_prefix })
 }
 
 resource "aws_efs_mount_target" "eks" {
