@@ -17,5 +17,5 @@ variable "secret_naming_convention" {
 
 variable "owning_user_email" {
   description = "Email of the Admin user to access Match."
-  type        = strings
+  type        = string
 }
