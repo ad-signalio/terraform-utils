@@ -55,5 +55,6 @@ resource "aws_secretsmanager_secret_version" "user_password_version" {
   secret_id = aws_secretsmanager_secret.user_password.id
   secret_string = jsonencode({
     password = random_password.user_password.result
+    email    = var.owning_user_email
   })
 }
