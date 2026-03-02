@@ -25,13 +25,13 @@ variable "values" {
 variable "install_crds" {
   description = "Whether to install KEDA CRDs using the Helm chart (not recommended for production)"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "enabled" {
   description = "Whether to enable the KEDA module"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "eks_cluster_name" {
