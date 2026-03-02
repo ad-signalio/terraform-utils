@@ -18,16 +18,11 @@ locals {
     crd
     if crd != null
   ]
-}
 
-data "aws_eks_clusters" "default" {}
-
-locals {
-  cluster_created = contains(data.aws_eks_clusters.default.names, var.eks_cluster_name)
 }
 
 resource "kubernetes_manifest" "keda_crds" {
-  count = var.enabled && var.install_crds ? length(local.crds) : 0
+  count = length(local.crds)
 
   manifest = local.crds[count.index]
 }
