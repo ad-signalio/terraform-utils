@@ -3,18 +3,3 @@ variable "eks_cluster_name" {
   type        = string
 }
 
-variable "eks_cluster_endpoint" {
-  description = "The endpoint for the EKS cluster."
-  type        = string
-}
-
-variable "eks_cluster_certificate" {
-  description = "The base64 encoded certificate for the EKS cluster."
-  type        = string
-}
-
-variable "eks_cluster_token" {
-  description = "The authentication token for the EKS cluster."
-  type        = string
-}
-
