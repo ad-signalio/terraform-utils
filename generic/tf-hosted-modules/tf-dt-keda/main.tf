@@ -7,8 +7,9 @@ resource "helm_release" "keda" {
   namespace        = var.namespace
   create_namespace = true
 
-  # Temp reenable built-in CRD installation since we manage them manually
-  skip_crds = var.install_crds
+  # Temp reenable built-in CRD installation 
+  # let helm manage them
+  skip_crds = false
 
   values = concat(var.values, [
     yamlencode({
@@ -20,5 +21,4 @@ resource "helm_release" "keda" {
     yamlencode(var.settings)
   ])
 
-  depends_on = [kubernetes_manifest.keda_crds]
 }
