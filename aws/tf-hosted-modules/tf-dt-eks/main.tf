@@ -47,16 +47,6 @@ locals {
   }
 
   # auto mode handles ebs and vpc cni
-  vpc_cni = var.use_auto_mode ? {} : {
-    before_compute              = true
-    resolve_conflicts_on_create = "OVERWRITE"
-    resolve_conflicts_on_update = "OVERWRITE"
-  }
-  ebs_csi = var.use_auto_mode ? {} : {
-    service_account_role_arn = module.ebs_csi_irsa.arn
-  }
-
-  # auto mode handles ebs and vpc cni
   add_ons = var.use_auto_mode ? {
     aws-efs-csi-driver = {
       service_account_role_arn = module.efs_csi_irsa.arn
@@ -121,10 +111,7 @@ module "eks_al2023_cluster" {
   cloudwatch_log_group_retention_in_days = 30
 
   create_auto_mode_iam_resources = true
-  compute_config = {
-    enabled    = true
-    node_pools = ["system", "general-purpose"]
-  }
+  compute_config                 = local.compute_config
 
   control_plane_scaling_config = {
     tier = "standard"
@@ -140,10 +127,8 @@ module "eks_al2023_cluster" {
 
   eks_managed_node_groups = local.eks_managed_node_groups
 
-  access_entries = merge(
-    local.infra_admin_roles,
-    local.infra_admin_sso_permission_sets,
-  var.extra_access_entries)
+  access_entries                           = var.access_entries
+  enable_cluster_creator_admin_permissions = true
 
   tags                      = var.tags
   cloudwatch_log_group_tags = var.tags
@@ -160,45 +145,6 @@ module "eks_al2023_cluster" {
   }
 }
 
-data "aws_iam_roles" "sso_permset" {
-  for_each    = toset(var.admin_access_sso_permission_set_names)
-  name_regex  = "AWSReservedSSO_${each.key}.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
-}
-
-locals {
-  infra_admin_roles = {
-    for role_name in var.admin_access_role_names : role_name => {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${role_name}"
-      policy_associations = {
-        admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
-  }
-
-  permission_set_roles = flatten([
-    for permsets in data.aws_iam_roles.sso_permset : permsets.arns
-  ])
-
-  infra_admin_sso_permission_sets = {
-    for permset_role in local.permission_set_roles : element(split("/", permset_role), -1) => {
-      principal_arn = permset_role
-      policy_associations = {
-        admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
-  }
-}
 
 data "aws_eks_cluster_auth" "this" {
   name = module.eks_al2023_cluster.cluster_name

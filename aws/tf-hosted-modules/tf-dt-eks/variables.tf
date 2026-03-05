@@ -15,20 +15,7 @@ variable "node_instance_type" {
   default     = "t3.2xlarge"
 }
 
-variable "admin_access_sso_permission_set_names" {
-  description = "A list of AWS SSO permission set names (NOT full ARNs) that exist in the account that will have admin access to the EKS cluster eg 'Infra'"
-  type        = list(string)
-  default     = []
-}
-
-variable "admin_access_role_names" {
-  description = "A list of IAM role names (NOT full ARNs) that exist in the account that will have admin access to the EKS cluster"
-  type        = list(string)
-  default     = []
-
-}
-
-variable "extra_access_entries" {
+variable "access_entries" {
   description = "Map of extra Cluster access entries. See terraform-aws-modules/eks/aws for details."
   type        = map(any)
   default     = {}
