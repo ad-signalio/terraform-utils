@@ -50,7 +50,7 @@ resource "helm_release" "keda" {
   values = concat(var.values, [
     yamlencode({
       crds = {
-        install = var.install_crds_separately
+        install = !var.install_crds_separately
       }
       watchNamespace = var.application_namespace
     }),
