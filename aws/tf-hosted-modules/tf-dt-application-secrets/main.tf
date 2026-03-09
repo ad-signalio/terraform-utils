@@ -1,15 +1,10 @@
-## create secrets for
-## 1. api-secrets
-## 2. user password for the system
-
 resource "random_password" "secret_key_base" {
   length  = 128
   special = false
 }
 
-resource "random_password" "api_secret_key_base" {
-  length  = 128
-  special = false
+resource "random_id" "api_secret_key_base" {
+  byte_length = 64 # 64 bytes = 128 hex characters
 }
 
 resource "random_id" "ingest_credential_encryption_key" {
@@ -31,7 +26,7 @@ resource "aws_secretsmanager_secret_version" "api_secrets_version" {
   secret_string = jsonencode({
     ingest_credential_encryption_key = random_id.ingest_credential_encryption_key.hex
     secret_key_base                  = random_password.secret_key_base.result
-    api_secret_key_base              = random_password.api_secret_key_base.result
+    api_secret_key_base              = random_id.api_secret_key_base.hex
   })
 }
 
