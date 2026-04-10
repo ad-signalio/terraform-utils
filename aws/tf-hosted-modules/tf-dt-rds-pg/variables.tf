@@ -26,12 +26,6 @@ variable "parameter_group_family" {
   default     = "postgres17"
 }
 
-variable "major_engine_version" {
-  description = "The major version of the Postgres database engine option group"
-  type        = string
-  default     = "17.4"
-}
-
 variable "instance_class" {
   description = "The instance class to use for the RDS instance"
   type        = string
@@ -115,4 +109,10 @@ variable "create_aws_secret" {
   description = "Create a secret with the rds config to AWS Secrets Manager"
   type        = bool
   default     = true
+}
+
+variable "minimal_db_config" {
+  description = "When true, disables multi-AZ and overrides instance_class to db.m5.xlarge. Intended for test and internal load test environments to reduce RDS costs."
+  type        = bool
+  default     = false
 }
