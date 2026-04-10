@@ -1,7 +1,3 @@
-locals {
-  cluster_name_prefix = var.env_name
-}
-
 resource "random_password" "db_password" {
   length      = 24
   special     = false
@@ -18,7 +14,7 @@ module "db" {
 
   engine                = "postgres"
   engine_version        = var.engine_version
-  instance_class        = var.instance_class
+  instance_class        = var.minimal_db_config ? "db.m5.xlarge" : var.instance_class
   allocated_storage     = var.allocated_storage
   max_allocated_storage = var.max_allocated_storage
 
@@ -54,7 +50,7 @@ module "db" {
   password                             = random_password.db_password.result
   manage_master_user_password_rotation = false
 
-  multi_az = true
+  multi_az = var.minimal_db_config ? false : true
 
   tags = var.tags
 
