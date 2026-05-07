@@ -128,7 +128,7 @@ module "eks_al2023_cluster" {
   eks_managed_node_groups = local.eks_managed_node_groups
 
   access_entries                           = var.access_entries
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
 
   tags                      = var.tags
   cloudwatch_log_group_tags = var.tags
