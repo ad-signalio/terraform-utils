@@ -70,3 +70,9 @@ variable "use_auto_mode" {
   type        = bool
   default     = true
 }
+
+variable "enable_cluster_creator_admin_permissions" {
+  description = "Whether to grant admin permissions to the user who creates the cluster. Default is true."
+  type        = bool
+  default     = false
+}
