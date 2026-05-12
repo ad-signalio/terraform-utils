@@ -16,6 +16,7 @@ variable "secret_naming_convention" {
 }
 
 variable "owning_user_email" {
-  description = "Email of the Admin user to access Match."
+  description = "Email of the Admin user to access Match. Deprecated — email is now set in helm values, not stored in AWS Secrets Manager."
   type        = string
+  default     = ""
 }
