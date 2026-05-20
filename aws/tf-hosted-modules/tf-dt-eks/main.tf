@@ -52,8 +52,10 @@ locals {
       service_account_role_arn = module.efs_csi_irsa.arn
     }
     aws-secrets-store-csi-driver-provider = {
-      service_account_role_arn = module.secrets_csi_irsa.arn
-      namespace                = "kube-system"
+      addon_version               = var.ascp_addon_version
+      resolve_conflicts_on_update = "OVERWRITE"
+      service_account_role_arn    = module.secrets_csi_irsa.arn
+      namespace                   = "kube-system"
       configuration_values = jsonencode({
         secrets-store-csi-driver = {
           enableSecretRotation = true
@@ -81,8 +83,10 @@ locals {
     }
     aws-ebs-csi-driver = {}
     aws-secrets-store-csi-driver-provider = {
-      service_account_role_arn = module.secrets_csi_irsa.arn
-      namespace                = "kube-system"
+      addon_version               = var.ascp_addon_version
+      resolve_conflicts_on_update = "OVERWRITE"
+      service_account_role_arn    = module.secrets_csi_irsa.arn
+      namespace                   = "kube-system"
       configuration_values = jsonencode({
         secrets-store-csi-driver = {
           enableSecretRotation = true
