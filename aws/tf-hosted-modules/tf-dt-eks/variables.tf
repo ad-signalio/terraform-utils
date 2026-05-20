@@ -65,6 +65,12 @@ variable "kubernetes_version" {
   default     = "1.34"
 }
 
+variable "ascp_addon_version" {
+  description = "The version of the AWS Secrets Store CSI Driver Provider (ASCP) EKS add-on"
+  type        = string
+  default     = "v3.1.0-eksbuild.1"
+}
+
 variable "use_auto_mode" {
   description = "Choose to use, EKS Auto Mode. Default is true. If false, `node_count` and `node_instance_type` variables will be used to create a managed node group with specified count and instance type."
   type        = bool
