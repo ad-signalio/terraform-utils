@@ -15,9 +15,9 @@ variable "subnet_ids" {
 }
 
 variable "engine_version" {
-  description = "The Postgres database engine version"
+  description = "The Postgres database engine version. Major-only by default so RDS selects the current minor; a pinned minor rots as AWS retires it."
   type        = string
-  default     = "17.4"
+  default     = "17"
 }
 
 variable "parameter_group_family" {

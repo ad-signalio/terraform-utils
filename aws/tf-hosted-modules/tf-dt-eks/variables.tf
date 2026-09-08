@@ -82,3 +82,36 @@ variable "enable_cluster_creator_admin_permissions" {
   type        = bool
   default     = false
 }
+variable "create_compute_dependent_addons" {
+  description = <<-DESC
+    Create the addons that need compute before terraform will consider them
+    healthy: metrics-server and aws-efs-csi-driver, both Deployments.
+
+    Set false for the apply that creates the cluster when compute comes from
+    custom node pools. Those are Kubernetes CRDs, so they cannot be planned
+    until the cluster exists, which means they land in a later apply -- and
+    these addons would otherwise sit DEGRADED with
+    InsufficientNumberOfReplicas until the addon create timeout, failing that
+    first apply. Leave at the default for every apply after it.
+
+    Only consulted under use_auto_mode. With managed node groups the upstream
+    module already orders addons after the node groups.
+  DESC
+  type        = bool
+  default     = true
+}
+
+variable "use_builtin_node_pools" {
+  description = <<-DESC
+    Use EKS Auto Mode's built-in "system" and "general-purpose" node pools.
+
+    Set false when supplying custom node pools -- notably to get tags onto compute,
+    which the built-in pools cannot do: they use the default NodeClass, which
+    carries no tags. See the tf-dt-eks-auto-mode-nodepool module.
+
+    When false, this module creates the EC2 access entry the node IAM role needs,
+    because EKS only manages node access automatically for the built-in pools.
+  DESC
+  type        = bool
+  default     = false
+}

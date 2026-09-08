@@ -3,6 +3,7 @@ data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
 locals {
+  # Two AZs to reduce data transfer costs at the expense of resilience
   azs = slice(data.aws_availability_zones.available.names, 0, var.availability_zone_count)
 
   cluster_name_prefix = var.env_name
@@ -10,6 +11,7 @@ locals {
 
 resource "aws_eip" "this" {
   tags = merge({
+    # eg. sbox-adsignal-shared-us1-vpc-natgw
     Name = "${var.env_name}-vpc-natgw"
   }, var.tags)
 }
@@ -33,7 +35,11 @@ module "vpc" {
   enable_dns_hostnames                 = true
   reuse_nat_ips                        = true
   external_nat_ip_ids                  = [aws_eip.this.id]
-  default_security_group_tags          = var.tags
+  # Applies to every resource the module creates. Without it the NAT gateway,
+  # route tables and internet gateway are untagged -- the *_tags inputs below
+  # only cover the resources they name.
+  tags                        = var.tags
+  default_security_group_tags = var.tags
   public_subnet_tags = merge({
     "subnet"                                             = var.env_name
     "public"                                             = "true"
