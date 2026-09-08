@@ -30,11 +30,16 @@ resource "kubernetes_manifest" "match_alb_ingress_class_params" {
     metadata = {
       name = "match-alb"
     }
-    spec = {
-      scheme = "internet-facing"
-      group = {
-        name = "match-alb"
-      }
-    }
+    spec = merge(
+      {
+        scheme = "internet-facing"
+        group = {
+          name = "match-alb"
+        }
+      },
+      length(var.tags) > 0 ? {
+        tags = [for k, v in var.tags : { key = k, value = v }]
+      } : {},
+    )
   }
 }

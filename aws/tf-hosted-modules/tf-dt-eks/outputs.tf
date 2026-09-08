@@ -56,3 +56,12 @@ output "secrets_csi_irsa_role_arn" {
   description = "The ARN of the IAM Role for the Secrets CSI Driver"
   value       = module.secrets_csi_irsa.arn
 }
+output "node_iam_role_name" {
+  description = "Name of the EKS Auto Mode node IAM role. A custom NodeClass references it by name."
+  value       = module.eks_al2023_cluster.node_iam_role_name
+}
+
+output "node_iam_role_arn" {
+  description = "ARN of the EKS Auto Mode node IAM role"
+  value       = module.eks_al2023_cluster.node_iam_role_arn
+}
