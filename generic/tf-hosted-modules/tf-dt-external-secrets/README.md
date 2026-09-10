@@ -28,15 +28,15 @@ Requires a `helm` provider configured against the cluster.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.9 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.2.0 |
+| ---- | ------- |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.9 |
 
 ## Modules
 
@@ -45,13 +45,13 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.external_secrets](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | Version of the external-secrets Helm chart. | `string` | `"2.6.0"` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Whether to install the External Secrets Operator. | `bool` | `true` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace to install ESO into (created if absent). | `string` | `"external-secrets"` | no |
@@ -61,6 +61,6 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_namespace"></a> [namespace](#output\_namespace) | Namespace the External Secrets Operator is installed into. |
 <!-- END_TF_DOCS -->
