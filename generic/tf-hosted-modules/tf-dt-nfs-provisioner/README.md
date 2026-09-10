@@ -3,13 +3,13 @@
 Terraform module to deploy an in-cluster NFS server + dynamic RWX provisioner
 via the kubernetes-sigs [nfs-ganesha-server-and-external-provisioner](https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner)
 Helm chart. Provides a `ReadWriteMany` StorageClass backed by a single RWO
-cloud disk — the cloud-agnostic shared-storage layer for match internal test
+cloud disk - the cloud-agnostic shared-storage layer for match internal test
 environments (and a bare-metal option), replacing EFS/Filestore where a
 managed NFS service is not justified.
 
 ```
 RWO disk (EBS / GCP PD / local-path)
-  → NFS server pod (Ganesha, userspace — no kernel module, no privileged mode)
+  → NFS server pod (Ganesha, userspace - no kernel module, no privileged mode)
     → RWX StorageClass → shared PVC mounted by web / workers / scaled jobs
 ```
 
@@ -22,7 +22,7 @@ upstream.
 
 | Setting | Why |
 |---|---|
-| `mountOptions: vers=4.1` | Chart default is NFSv3. v4.1 has protocol-native locking — required for the `.lo` lock files in the audio pipeline. |
+| `mountOptions: vers=4.1` | Chart default is NFSv3. v4.1 has protocol-native locking - required for the `.lo` lock files in the audio pipeline. |
 | `mountOptions: addr=<clusterIP>` + pinned `service.clusterIP` | Minimal host OSes (Bottlerocket / EKS Auto Mode) ship no `mount.nfs` helper; the in-tree NFS mount fails with "mount program didn't pass remote address" unless the address is passed explicitly. Pinning the Service IP makes this declarative. |
 | `parameters.gid` | Provisioned exports become setgid group dirs owned by this GID, so nonroot pods (match runs as 65532) can read/write. |
 
@@ -30,7 +30,7 @@ upstream.
 
 Single NFS server pod: a reschedule pauses I/O briefly; hard mounts (default)
 recover transparently and NFSv4.1 grace-period reclaim preserves held locks.
-Suitable for internal testing — production client deployments should use a
+Suitable for internal testing - production client deployments should use a
 managed NFS service (EFS / Filestore).
 
 ## Usage
@@ -52,15 +52,15 @@ module "nfs_provisioner" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.9 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.2.0 |
+| ---- | ------- |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.9 |
 
 ## Modules
 
@@ -69,13 +69,13 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.nfs_provisioner](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_backing_disk_size"></a> [backing\_disk\_size](#input\_backing\_disk\_size) | Size of the backing disk for the NFS server. | `string` | `"200Gi"` | no |
 | <a name="input_backing_storage_class"></a> [backing\_storage\_class](#input\_backing\_storage\_class) | RWO StorageClass backing the NFS server's disk (e.g. auto-ebs-gp2 on EKS Auto Mode, standard-rwo on GKE). null uses the cluster default. | `string` | `null` | no |
 | <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | Version of the kubernetes-sigs nfs-server-provisioner Helm chart. | `string` | `"1.8.0"` | no |
@@ -94,7 +94,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_namespace"></a> [namespace](#output\_namespace) | Namespace the NFS provisioner is installed into. |
 | <a name="output_service_cluster_ip"></a> [service\_cluster\_ip](#output\_service\_cluster\_ip) | Pinned ClusterIP of the NFS server Service. |
 | <a name="output_storage_class_name"></a> [storage\_class\_name](#output\_storage\_class\_name) | Name of the RWX StorageClass created for consumers (use as storage.sharedStorage.storageClassName in helm-match values). |

@@ -96,7 +96,7 @@ No resources.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_env_additional_id"></a> [env\_additional\_id](#input\_env\_additional\_id) | An OPTIONAL additional identifier to be appended after the first Identifier - should mostly not be used. Limited to 5 characters. | `string` | `""` | no |
 | <a name="input_env_id"></a> [env\_id](#input\_env\_id) | The unique ID such as customer or use for an environment name, eg bigcorp, mediaorg, adsignal or snicket. Limited to 12 characters. | `string` | n/a | yes |
 | <a name="input_env_region"></a> [env\_region](#input\_env\_region) | The region (e.g., us1, eu1, ap1) | `string` | n/a | yes |
@@ -105,7 +105,7 @@ No resources.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_env_name"></a> [env\_name](#output\_env\_name) | Standardized name for resources |
 | <a name="output_tags"></a> [tags](#output\_tags) | Standardized tags for resources |
 <!-- END_TF_DOCS -->
