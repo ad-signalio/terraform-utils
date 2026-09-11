@@ -1,6 +1,12 @@
 variable "env_name" {
   description = "The environment name (e.g., sbox-adsignal-shared-us1)"
   type        = string
+
+  validation {
+    # 64-char IAM role name cap minus the longest suffix iam.tf appends (-secrets-role, 13 chars).
+    condition     = length(var.env_name) <= 51
+    error_message = "env_name must be 51 characters or fewer: efs_csi_irsa/ebs_csi_irsa/secrets_csi_irsa build IAM role names from it (e.g. \"${var.env_name}-secrets-role\"), and AWS IAM role names cap at 64 characters."
+  }
 }
 
 variable "node_count" {
@@ -19,12 +25,6 @@ variable "access_entries" {
   description = "Map of extra Cluster access entries. See terraform-aws-modules/eks/aws for details."
   type        = map(any)
   default     = {}
-}
-
-variable "iam_role_use_name_prefix" {
-  description = "Determines whether the IAM role name (`iam_role_name`) is used as a prefix"
-  type        = bool
-  default     = true
 }
 
 variable "tags" {

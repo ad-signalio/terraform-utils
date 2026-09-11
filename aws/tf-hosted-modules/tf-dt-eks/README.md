@@ -2,20 +2,20 @@
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.70 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.70 |
 
 ## Modules
 
 | Name | Source | Version |
-| ---- | ------ | ------- |
+|------|--------|---------|
 | <a name="module_ebs_csi_irsa"></a> [ebs\_csi\_irsa](#module\_ebs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 | <a name="module_efs_csi_irsa"></a> [efs\_csi\_irsa](#module\_efs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 | <a name="module_eks_al2023_cluster"></a> [eks\_al2023\_cluster](#module\_eks\_al2023\_cluster) | terraform-aws-modules/eks/aws | ~> 21.15.1 |
@@ -24,7 +24,7 @@
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [aws_eks_access_entry.auto_node](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_entry) | resource |
 | [aws_eks_access_policy_association.auto_node](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_policy_association) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -34,13 +34,12 @@
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_access_entries"></a> [access\_entries](#input\_access\_entries) | Map of extra Cluster access entries. See terraform-aws-modules/eks/aws for details. | `map(any)` | `{}` | no |
 | <a name="input_ascp_addon_version"></a> [ascp\_addon\_version](#input\_ascp\_addon\_version) | The version of the AWS Secrets Store CSI Driver Provider (ASCP) EKS add-on | `string` | `"v3.1.0-eksbuild.1"` | no |
 | <a name="input_create_compute_dependent_addons"></a> [create\_compute\_dependent\_addons](#input\_create\_compute\_dependent\_addons) | Create the addons that need compute before terraform will consider them<br/>healthy: metrics-server and aws-efs-csi-driver, both Deployments.<br/><br/>Set false for the apply that creates the cluster when compute comes from<br/>custom node pools. Those are Kubernetes CRDs, so they cannot be planned<br/>until the cluster exists, which means they land in a later apply -- and<br/>these addons would otherwise sit DEGRADED with<br/>InsufficientNumberOfReplicas until the addon create timeout, failing that<br/>first apply. Leave at the default for every apply after it.<br/><br/>Only consulted under use\_auto\_mode. With managed node groups the upstream<br/>module already orders addons after the node groups. | `bool` | `true` | no |
 | <a name="input_enable_cluster_creator_admin_permissions"></a> [enable\_cluster\_creator\_admin\_permissions](#input\_enable\_cluster\_creator\_admin\_permissions) | Whether to grant admin permissions to the user who creates the cluster. Default is true. | `bool` | `false` | no |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
-| <a name="input_iam_role_use_name_prefix"></a> [iam\_role\_use\_name\_prefix](#input\_iam\_role\_use\_name\_prefix) | Determines whether the IAM role name (`iam_role_name`) is used as a prefix | `bool` | `true` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | The Kubernetes version for the EKS cluster | `string` | `"1.34"` | no |
 | <a name="input_node_count"></a> [node\_count](#input\_node\_count) | Number of compute nodes for the EKS cluster | `number` | `1` | no |
 | <a name="input_node_instance_type"></a> [node\_instance\_type](#input\_node\_instance\_type) | Instance type for EKS compute nodes | `string` | `"t3.2xlarge"` | no |
@@ -56,7 +55,7 @@
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_cluster_primary_security_group_id"></a> [cluster\_primary\_security\_group\_id](#output\_cluster\_primary\_security\_group\_id) | Cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control-plane-to-data-plane communication. Referred to as 'Cluster security group' in the EKS console |
 | <a name="output_cluster_security_group_id"></a> [cluster\_security\_group\_id](#output\_cluster\_security\_group\_id) | ID of the cluster security group |
 | <a name="output_eks_cluster"></a> [eks\_cluster](#output\_eks\_cluster) | n/a |

@@ -13,8 +13,8 @@ module "efs_csi_irsa" {
 
   attach_efs_csi_policy = true
 
-  name            = var.iam_role_use_name_prefix ? "${local.name}-role-efs" : "role-efs"
-  use_name_prefix = var.iam_role_use_name_prefix
+  name            = "${local.name}-role-efs"
+  use_name_prefix = false
 
   oidc_providers = {
     main = {
@@ -32,8 +32,8 @@ module "ebs_csi_irsa" {
 
   attach_ebs_csi_policy = true
 
-  name            = var.iam_role_use_name_prefix ? "${local.name}-role-ebs" : "role-ebs"
-  use_name_prefix = var.iam_role_use_name_prefix
+  name            = "${local.name}-role-ebs"
+  use_name_prefix = false
 
   oidc_providers = {
     main = {
@@ -56,10 +56,8 @@ module "secrets_csi_irsa" {
     "arn:aws:secretsmanager:*:*:secret:match-honeybadger-secret*",
   ]
 
-
-
-  name            = var.iam_role_use_name_prefix ? "${var.env_name}-secrets-role" : "secrets-role"
-  use_name_prefix = var.iam_role_use_name_prefix
+  name            = "${var.env_name}-secrets-role"
+  use_name_prefix = false
 
   oidc_providers = {
     main = {
