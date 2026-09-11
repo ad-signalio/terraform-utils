@@ -144,9 +144,11 @@ module "eks_al2023_cluster" {
   # EKS Addons
   addons = local.add_ons
 
-  vpc_id                          = var.vpc_id
-  subnet_ids                      = var.private_subnet_ids
-  iam_role_use_name_prefix        = var.iam_role_use_name_prefix
+  vpc_id     = var.vpc_id
+  subnet_ids = var.private_subnet_ids
+
+  # env_name is already unique per environment -- no need for a name_prefix.
+  iam_role_use_name_prefix        = false
   include_oidc_root_ca_thumbprint = false
 
   eks_managed_node_groups = local.eks_managed_node_groups
