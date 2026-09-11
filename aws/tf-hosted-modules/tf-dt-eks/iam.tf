@@ -57,7 +57,8 @@ module "secrets_csi_irsa" {
   ]
 
 
-  name            = var.iam_role_use_name_prefix ? "${var.env_name}-match-secrets-role" : "match-secrets-role"
+
+  name            = var.iam_role_use_name_prefix ? "${var.env_name}-secrets-role" : "secrets-role"
   use_name_prefix = var.iam_role_use_name_prefix
 
   oidc_providers = {
