@@ -14,6 +14,7 @@ module "efs_csi_irsa" {
   attach_efs_csi_policy = true
 
   name            = "${local.name}-role-efs"
+  policy_name     = "${local.name}-role-efs"
   use_name_prefix = false
 
   oidc_providers = {
@@ -33,6 +34,7 @@ module "ebs_csi_irsa" {
   attach_ebs_csi_policy = true
 
   name            = "${local.name}-role-ebs"
+  policy_name     = "${local.name}-role-ebs"
   use_name_prefix = false
 
   oidc_providers = {
@@ -57,6 +59,7 @@ module "secrets_csi_irsa" {
   ]
 
   name            = "${var.env_name}-secrets-role"
+  policy_name     = "${var.env_name}-secrets-role"
   use_name_prefix = false
 
   oidc_providers = {
