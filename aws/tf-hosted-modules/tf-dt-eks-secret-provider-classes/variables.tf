@@ -47,15 +47,15 @@ variable "k8s_rds_pg_secret_name" {
 }
 
 variable "namespace" {
-  description = "Namespace for the release. The chart's templates hardcode \"match\", so anything else splits the release record from its objects."
+  description = "Namespace holding the release record. The chart hardcodes \"match\" in its own templates, so this does not move the objects."
   type        = string
   default     = "match"
 }
 
 variable "create_namespace" {
-  description = "Create the namespace. Leave false when tf-dt-keda already owns it."
+  description = "Create the namespace if absent. On by default: these secrets have to exist before anything that consumes them, so this module is usually first into the namespace."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "secret_syncer_image" {
