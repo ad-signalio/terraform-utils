@@ -39,5 +39,7 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+| ---- | ----------- |
+| <a name="output_ingress_class_name"></a> [ingress\_class\_name](#output\_ingress\_class\_name) | Name of the IngressClass, for the match chart's ingress.className. |
 <!-- END_TF_DOCS -->

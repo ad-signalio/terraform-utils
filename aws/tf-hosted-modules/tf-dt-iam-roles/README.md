@@ -54,6 +54,7 @@
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_grafana_cloudwatch_role_arn"></a> [grafana\_cloudwatch\_role\_arn](#output\_grafana\_cloudwatch\_role\_arn) | ARN of the role Grafana assumes to read CloudWatch, for monitoring.awsDashboards.cloudwatch.assumeRoleArn. Created by this module already; it just had no way to be discovered. |
 | <a name="output_role_arn"></a> [role\_arn](#output\_role\_arn) | n/a |
 | <a name="output_role_name"></a> [role\_name](#output\_role\_name) | n/a |
 <!-- END_TF_DOCS -->

@@ -57,5 +57,8 @@
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_db_name"></a> [db\_name](#output\_db\_name) | Database name, for the match chart's postgres.database. |
+| <a name="output_db_port"></a> [db\_port](#output\_db\_port) | Port, for the match chart's postgres.port. |
+| <a name="output_db_username"></a> [db\_username](#output\_db\_username) | Master username, for the match chart's postgres.username. |
 | <a name="output_rds_pg_secret_name"></a> [rds\_pg\_secret\_name](#output\_rds\_pg\_secret\_name) | n/a |
 <!-- END_TF_DOCS -->

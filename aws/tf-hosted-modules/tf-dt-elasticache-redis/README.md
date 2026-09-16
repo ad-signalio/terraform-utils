@@ -47,4 +47,5 @@
 | <a name="output_reader_endpoint"></a> [reader\_endpoint](#output\_reader\_endpoint) | n/a |
 | <a name="output_redis"></a> [redis](#output\_redis) | n/a |
 | <a name="output_redis_secret_name"></a> [redis\_secret\_name](#output\_redis\_secret\_name) | n/a |
+| <a name="output_redis_url"></a> [redis\_url](#output\_redis\_url) | Connection URL for the primary endpoint, for the match chart's sidekiq.redisServerUrl and redisClientUrl. Built the same way as the Secrets Manager value above, so the two cannot drift. rediss:// because transit encryption is on. |
 <!-- END_TF_DOCS -->
