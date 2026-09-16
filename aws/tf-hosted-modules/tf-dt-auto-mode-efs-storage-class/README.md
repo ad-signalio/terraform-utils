@@ -28,5 +28,7 @@ No inputs.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+| ---- | ----------- |
+| <a name="output_storage_class_name"></a> [storage\_class\_name](#output\_storage\_class\_name) | Name of the EBS StorageClass. This is the one that works under EKS Auto Mode -- the in-tree gp2 class does not -- so it is what Prometheus, Grafana and any other PVC in the release should use. |
 <!-- END_TF_DOCS -->

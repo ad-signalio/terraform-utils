@@ -39,5 +39,7 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+| ---- | ----------- |
+| <a name="output_storage_class_name"></a> [storage\_class\_name](#output\_storage\_class\_name) | Name of the EFS-backed StorageClass, for the match chart's storage.sharedStorage.storageClassName. |
 <!-- END_TF_DOCS -->

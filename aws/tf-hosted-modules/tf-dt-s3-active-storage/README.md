@@ -37,4 +37,5 @@ No modules.
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_bucket_arn"></a> [bucket\_arn](#output\_bucket\_arn) | ARNs of the bucket |
+| <a name="output_bucket_name"></a> [bucket\_name](#output\_bucket\_name) | Name of the ActiveStorage bucket, for the match chart's s3.primaryBucket. The chart wants the name, not the ARN. |
 <!-- END_TF_DOCS -->
