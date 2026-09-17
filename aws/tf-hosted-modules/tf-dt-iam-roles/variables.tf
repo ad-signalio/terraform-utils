@@ -57,3 +57,8 @@ variable "secret_naming_convention" {
   type        = string
   default     = ""
 }
+variable "ingest_buckets" {
+  description = "Buckets this environment ingests customer content FROM. Not created or owned by this stack, unlike s3_bucket_name, so they are granted through their own policy that can be narrowed or detached independently. Names, not ARNs."
+  type        = list(string)
+  default     = []
+}
