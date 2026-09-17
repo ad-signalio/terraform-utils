@@ -25,6 +25,32 @@ data "aws_iam_policy_document" "s3_policy" {
   }
 }
 
+# Buckets we ingest FROM. Deliberately a separate document and policy rather
+# than extra resources on s3_policy above: that one covers the bucket this
+# stack creates and owns, this one covers a bucket it does not. Keeping them
+# apart means enabling ingest produces no diff at all on the primary grant,
+# and the actions here can be narrowed later without touching it.
+data "aws_iam_policy_document" "ingest_s3" {
+  count = length(var.ingest_buckets) > 0 ? 1 : 0
+
+  statement {
+    sid    = "IngestBucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = flatten([
+      for b in var.ingest_buckets : [
+        "arn:aws:s3:::${b}",
+        "arn:aws:s3:::${b}/*",
+      ]
+    ])
+  }
+}
+
 #AUTO-INGEST POLICY
 data "aws_iam_policy_document" "sas_service_account_autoingest" {
   statement {
@@ -217,10 +243,15 @@ module "iam_assumable_role_with_oidc" {
 
   provider_url = var.oidc_issuer_url
 
-  role_policy_arns = [
+  role_policy_arns = concat([
     aws_iam_policy.s3_policy.arn,
     aws_iam_policy.sas_service_account_autoingest.arn,
-  ]
+    ],
+    # Splat rather than a conditional: yields [] when there are no ingest
+    # buckets, and keeps the list length known at plan time, which the
+    # assumable-role module requires.
+    aws_iam_policy.ingest_s3[*].arn,
+  )
 
   oidc_fully_qualified_subjects  = ["system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"]
   oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
@@ -232,6 +263,16 @@ resource "aws_iam_policy" "s3_policy" {
   name_prefix = "${local.name}-s3-policy"
   description = "S3 access policy for ${var.s3_bucket_name}"
   policy      = data.aws_iam_policy_document.s3_policy.json
+
+  tags = var.tags
+}
+
+resource "aws_iam_policy" "ingest_s3" {
+  count = length(var.ingest_buckets) > 0 ? 1 : 0
+
+  name_prefix = "${local.name}-ingest-s3-policy"
+  description = "S3 access for the buckets this environment ingests from"
+  policy      = data.aws_iam_policy_document.ingest_s3[0].json
 
   tags = var.tags
 }
