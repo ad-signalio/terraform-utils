@@ -34,6 +34,25 @@ locals {
 
   # An explicit list wins over the lookup.
   certificate_arns = length(var.certificate_arns) > 0 ? var.certificate_arns : data.aws_acm_certificate.this[*].arn
+
+  # Snicket Labs support reaches customer environments from behind an egress
+  # proxy in our ops VPC, so everything we send arrives from this one address.
+  snicket_labs_egress_cidr = "18.168.92.90/32"
+
+  # Added only where it changes something. An internal load balancer is not
+  # reachable from our network whatever the security group says. An empty
+  # inbound_cidrs leaves the controller's 0.0.0.0/0 default in place, so adding
+  # our address there would narrow a wide-open load balancer to us alone --
+  # locking out the customer rather than letting us in. And there is nothing to
+  # add to a list that already admits the whole internet.
+  snicket_labs_lb_access = (
+    var.snicket_labs_remote_lb_access
+    && var.scheme == "internet-facing"
+    && length(var.inbound_cidrs) > 0
+    && !contains(var.inbound_cidrs, "0.0.0.0/0")
+  ) ? [local.snicket_labs_egress_cidr] : []
+
+  inbound_cidrs = distinct(concat(var.inbound_cidrs, local.snicket_labs_lb_access))
 }
 
 resource "kubernetes_manifest" "match_alb_ingress_class_params" {
@@ -46,7 +65,7 @@ resource "kubernetes_manifest" "match_alb_ingress_class_params" {
     }
     spec = merge(
       {
-        scheme = "internet-facing"
+        scheme = var.scheme
         group = {
           name = "match-alb"
         }
@@ -59,6 +78,12 @@ resource "kubernetes_manifest" "match_alb_ingress_class_params" {
       } : {},
       var.ssl_policy != "" ? {
         sslPolicy = var.ssl_policy
+      } : {},
+      # Left out entirely when empty: the controller's default is 0.0.0.0/0, and
+      # an empty list here would lock the load balancer down to nothing rather
+      # than mean "no opinion".
+      length(local.inbound_cidrs) > 0 ? {
+        inboundCIDRs = local.inbound_cidrs
       } : {},
     )
   }
