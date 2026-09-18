@@ -99,8 +99,17 @@ https://ad-signalio.github.io/helm-charts  →  secrets-configuration-aws
 ## Requirements
 
 - The ASCP addon, which `tf-dt-eks` installs
-- The `match` namespace, which `tf-dt-keda` creates
+- The `match` namespace, which this module creates by default. These secrets
+  have to exist before anything that consumes them, so it is usually first into
+  the namespace. Set `create_namespace = false` if something else owns it —
+  `tf-dt-keda` can, via `create_match_namespace`, though a scaling module is a
+  poor owner for the application namespace. Never have both create it in the
+  same configuration without a `depends_on` deciding the order
 - Schedulable compute, if `wait` is left on — the syncer is a Deployment
+
+The chart hardcodes `namespace: match` in every template, so `var.namespace`
+only decides where the release record lives — it does not move the objects.
+Worth fixing upstream to use `.Release.Namespace`.
 
 ## Troubleshooting
 

@@ -41,7 +41,7 @@ variable "application_namespace" {
 }
 
 variable "create_match_namespace" {
-  description = "Whether to create the Kubernetes namespace for the application (e.g., 'match') as part of this module. Set to false if the namespace is already created by another module or manually."
+  description = "Whether to create the application namespace (e.g. 'match') as part of this module. Off by default: a scaling module is a poor owner for the application namespace, and something else generally needs it earlier -- tf-dt-eks-secret-provider-classes creates it by default. Set true when nothing else does."
   type        = bool
-  default     = true
+  default     = false
 }
