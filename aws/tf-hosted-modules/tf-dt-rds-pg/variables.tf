@@ -116,3 +116,30 @@ variable "minimal_db_config" {
   type        = bool
   default     = false
 }
+
+variable "db_name" {
+  description = <<-EOT
+    Name of the initial database. Defaults to matchdb for the adsignal-match
+    chart; the platform chart uses platform.
+
+    Do not use "match" - it is a reserved word in RDS Postgres and the instance
+    will fail to create.
+
+    Changing this on an existing instance destroys and recreates it. Terraform
+    will say so in the plan; read it.
+  EOT
+  type        = string
+  default     = "matchdb"
+}
+
+variable "db_username" {
+  description = <<-EOT
+    Master username. Defaults to matchdb for the adsignal-match chart; the
+    platform chart uses platform.
+
+    Changing this on an existing instance destroys and recreates it, the same
+    as db_name.
+  EOT
+  type        = string
+  default     = "matchdb"
+}
