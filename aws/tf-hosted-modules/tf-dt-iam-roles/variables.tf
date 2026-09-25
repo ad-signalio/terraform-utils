@@ -62,3 +62,19 @@ variable "ingest_buckets" {
   type        = list(string)
   default     = []
 }
+
+variable "additional_oidc_subjects" {
+  description = <<-EOT
+    Extra fully-qualified OIDC subjects this role will trust, alongside the one
+    built from kubernetes_namespace and kubernetes_service_account.
+
+    Each entry is "system:serviceaccount:<namespace>:<service-account>", so the
+    namespace is part of it - a chart installed into a different namespace needs
+    its own entry even if the service account name is unchanged.
+
+    Intended for running the adsignal-match and platform charts side by side
+    during a cutover. Remove the old subject once the old chart is gone.
+  EOT
+  type        = list(string)
+  default     = []
+}

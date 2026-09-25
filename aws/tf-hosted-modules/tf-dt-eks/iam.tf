@@ -54,8 +54,13 @@ module "secrets_csi_irsa" {
   attach_external_secrets_policy = true
   external_secrets_secrets_manager_arns = [
     "arn:aws:secretsmanager:*:*:secret:${var.secret_naming_convention}*",
+    # Created by hand by the customer, so the names are fixed rather than
+    # derived. The adsignal-match and platform charts use different ones and
+    # both are listed so the two can run side by side during a cutover.
     "arn:aws:secretsmanager:*:*:secret:match-docker-secret*",
     "arn:aws:secretsmanager:*:*:secret:match-honeybadger-secret*",
+    "arn:aws:secretsmanager:*:*:secret:snicketlabs-docker-secret*",
+    "arn:aws:secretsmanager:*:*:secret:snicketlabs-honeybadger-secret*",
   ]
 
   name            = "${var.env_name}-secrets-role"
@@ -65,8 +70,9 @@ module "secrets_csi_irsa" {
   oidc_providers = {
     main = {
       provider_arn = local.oidc_provider_arn
-      # this must match the service account that exists in the cluster
-      namespace_service_accounts = ["match:secret-sync-sa"]
+      # Must match the service accounts that exist in the cluster. Namespaced,
+      # so the platform chart's namespace needs its own entry.
+      namespace_service_accounts = var.secret_sync_namespace_service_accounts
     }
   }
   tags = var.tags

@@ -40,6 +40,7 @@
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_additional_oidc_subjects"></a> [additional\_oidc\_subjects](#input_additional_oidc_subjects) | Extra fully-qualified OIDC subjects this role will trust, alongside the one built from kubernetes\_namespace and kubernetes\_service\_account.<br><br>Each entry is "system:serviceaccount:&lt;namespace&gt;:&lt;service-account&gt;", so the namespace is part of it - a chart installed into a different namespace needs its own entry even if the service account name is unchanged.<br><br>Intended for running the adsignal-match and platform charts side by side during a cutover. Remove the old subject once the old chart is gone. | `list(string)` | `[]` | no |
 | <a name="input_adsignal_org"></a> [adsignal\_org](#input\_adsignal\_org) | The Ad Signal organization name, typically 'adsignal' | `string` | `"adsignal"` | no |
 | <a name="input_allow_aws_secret_manager_access"></a> [allow\_aws\_secret\_manager\_access](#input\_allow\_aws\_secret\_manager\_access) | Whether to allow access to AWS Secrets Manager | `bool` | `true` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Names of domain name to associate with the load balancer if on route53 | `string` | n/a | yes |

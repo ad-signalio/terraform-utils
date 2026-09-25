@@ -253,7 +253,14 @@ module "iam_assumable_role_with_oidc" {
     aws_iam_policy.ingest_s3[*].arn,
   )
 
-  oidc_fully_qualified_subjects  = ["system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"]
+  # A trust policy can name more than one subject, and the subject carries the
+  # namespace as well as the service account. Both change between the
+  # adsignal-match and platform charts, so an environment running the two side
+  # by side needs both named here.
+  oidc_fully_qualified_subjects = concat(
+    ["system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"],
+    var.additional_oidc_subjects,
+  )
   oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
 
   tags = var.tags

@@ -115,3 +115,16 @@ variable "use_builtin_node_pools" {
   type        = bool
   default     = false
 }
+
+variable "secret_sync_namespace_service_accounts" {
+  description = <<-EOT
+    Service accounts allowed to assume the secrets role, as
+    "<namespace>:<service-account>".
+
+    Defaults to the adsignal-match chart's. An environment running the platform
+    chart alongside it adds "snicketlabs:secret-sync-sa"; one running only the
+    platform chart replaces the default outright.
+  EOT
+  type        = list(string)
+  default     = ["match:secret-sync-sa"]
+}
