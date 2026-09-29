@@ -46,17 +46,6 @@ variable "adsignal_org" {
   default     = "adsignal"
 }
 
-variable "allow_aws_secret_manager_access" {
-  description = "Whether to allow access to AWS Secrets Manager"
-  type        = bool
-  default     = true
-}
-
-variable "secret_naming_convention" {
-  description = "Naming convention for secrets to be accessed by the service account. This should correspond to the naming convention used in secrets manager."
-  type        = string
-  default     = ""
-}
 variable "ingest_buckets" {
   description = "Buckets this environment ingests customer content FROM. Not created or owned by this stack, unlike s3_bucket_name, so they are granted through their own policy that can be narrowed or detached independently. Names, not ARNs."
   type        = list(string)
