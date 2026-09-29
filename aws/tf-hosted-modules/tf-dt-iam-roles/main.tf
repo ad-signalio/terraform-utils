@@ -208,30 +208,6 @@ resource "aws_iam_role_policy_attachment" "grafana_cloudwatch_attach" {
   policy_arn = aws_iam_policy.grafana_cloudwatch.arn
 }
 
-resource "aws_iam_policy" "secrets_policy" {
-  count       = var.allow_aws_secret_manager_access ? 1 : 0
-  name        = "${var.secret_naming_convention}-secret-policy"
-  description = "Policy for deployment to access specific secrets"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ]
-        Resource = [
-          "arn:*:secretsmanager:*:*:secret:${var.secret_naming_convention}*",
-          "arn:*:secretsmanager:*:*:secret:match-docker-secret*",
-          "arn:*:secretsmanager:*:*:secret:match-honeybadger-secret*"
-        ]
-      }
-    ]
-  })
-}
-
 module "iam_assumable_role_with_oidc" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version = "~> 5.0"
@@ -283,10 +259,4 @@ resource "aws_iam_policy" "sas_service_account_autoingest" {
   policy      = data.aws_iam_policy_document.sas_service_account_autoingest.json
 
   tags = var.tags
-}
-
-resource "aws_iam_role_policy_attachment" "secrets_policy_attachment" {
-  count      = var.allow_aws_secret_manager_access ? 1 : 0
-  role       = module.iam_assumable_role_with_oidc.iam_role_name
-  policy_arn = aws_iam_policy.secrets_policy[0].arn
 }
