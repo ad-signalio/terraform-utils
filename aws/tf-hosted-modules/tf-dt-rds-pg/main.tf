@@ -18,9 +18,8 @@ module "db" {
   allocated_storage     = var.allocated_storage
   max_allocated_storage = var.max_allocated_storage
 
-  # match is a reserved database name for RDS Postgres
-  db_name  = "matchdb"
-  username = "matchdb"
+  db_name  = var.db_name
+  username = var.db_username
   port     = "5432"
 
 
