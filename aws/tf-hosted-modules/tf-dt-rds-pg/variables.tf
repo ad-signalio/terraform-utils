@@ -116,3 +116,15 @@ variable "minimal_db_config" {
   type        = bool
   default     = false
 }
+
+variable "db_name" {
+  description = "Name of the initial database. Not \"match\" - it is reserved in RDS Postgres. Changing this on an existing instance replaces it."
+  type        = string
+  default     = "matchdb"
+}
+
+variable "db_username" {
+  description = "Master username. Changing this on an existing instance replaces it."
+  type        = string
+  default     = "matchdb"
+}
