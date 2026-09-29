@@ -52,11 +52,12 @@ module "secrets_csi_irsa" {
   version = "~> 6.2.1"
 
   attach_external_secrets_policy = true
-  external_secrets_secrets_manager_arns = [
-    "arn:aws:secretsmanager:*:*:secret:${var.secret_naming_convention}*",
-    "arn:aws:secretsmanager:*:*:secret:match-docker-secret*",
-    "arn:aws:secretsmanager:*:*:secret:match-honeybadger-secret*",
-  ]
+  external_secrets_secrets_manager_arns = concat(
+    ["arn:aws:secretsmanager:*:*:secret:${var.secret_naming_convention}*"],
+    # Created by hand by the customer, so not derived from env_name.
+    [for name in var.hand_created_secret_names :
+    "arn:aws:secretsmanager:*:*:secret:${name}*"],
+  )
 
   name            = "${var.env_name}-secrets-role"
   policy_name     = "${var.env_name}-secrets-role"
@@ -65,8 +66,8 @@ module "secrets_csi_irsa" {
   oidc_providers = {
     main = {
       provider_arn = local.oidc_provider_arn
-      # this must match the service account that exists in the cluster
-      namespace_service_accounts = ["match:secret-sync-sa"]
+      # Must match the service account in the cluster, namespace included.
+      namespace_service_accounts = var.secret_sync_namespace_service_accounts
     }
   }
   tags = var.tags

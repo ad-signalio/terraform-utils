@@ -115,3 +115,15 @@ variable "use_builtin_node_pools" {
   type        = bool
   default     = false
 }
+
+variable "secret_sync_namespace_service_accounts" {
+  description = "Service accounts allowed to assume the secrets role, as \"<namespace>:<service-account>\". Defaults to the adsignal-match chart's; the platform chart uses \"snicketlabs:secret-sync-sa\"."
+  type        = list(string)
+  default     = ["match:secret-sync-sa"]
+}
+
+variable "hand_created_secret_names" {
+  description = "Secrets Manager secrets the customer creates by hand, which secret-sync may read. Defaults to the adsignal-match chart's; the platform chart uses the snicketlabs- prefixed names."
+  type        = list(string)
+  default     = ["match-docker-secret", "match-honeybadger-secret"]
+}
