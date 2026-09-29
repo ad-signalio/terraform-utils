@@ -37,7 +37,7 @@ module "secret_provider_classes" {
   rds_pg_secret_name = module.rds-postgres.rds_pg_secret_name
   redis_secret_name  = module.elasticache_redis.redis_secret_name
 
-  depends_on = [module.keda] # tf-dt-keda owns the match namespace
+  depends_on = [module.eks_auto_mode_nodepool] # the syncer is a Deployment
 }
 ```
 
@@ -45,13 +45,18 @@ module "secret_provider_classes" {
 
 | Kubernetes Secret | From |
 |---|---|
-| `match-api-secrets` | `api_secret_name` — Rails keys |
-| `match-owning-user-credentials` | `user_secret_name` |
-| `match-postgres-credentials` | `rds_pg_secret_name` |
+| `k8s_api_secret_name` (`match-api-secrets`) | `api_secret_name` — Rails keys |
+| `k8s_owning_user_secret_name` (`match-owning-user-credentials`) | `user_secret_name` |
+| `k8s_rds_pg_secret_name` (`match-postgres-credentials`) | `rds_pg_secret_name` |
 | `<cluster_name>-redis` | `redis_secret_name` |
-| `dockerconfig` | `match-docker-secret`, account-level |
-| `honeybadger-api-key` | `match-honeybadger-secret`, account-level |
+| `dockerconfig` | `docker_secret_name` (`match-docker-secret`), account-level |
+| `honeybadger-api-key` | `honeybadger_secret_name` (`match-honeybadger-secret`), account-level |
 | `smtp-secrets` | `smtp_secret_name`, only when set |
+
+Defaults in brackets. The platform chart consumes `api-secrets`,
+`owning-user-credentials` and `postgres-credentials` in namespace
+`snicketlabs`, and expects the account-level entries to be
+`snicketlabs-docker-secret` and `snicketlabs-honeybadger-secret`.
 
 The last two come from fixed, account-level Secrets Manager entries that
 **Terraform grants access to but never creates**. They have to exist before the
@@ -99,7 +104,7 @@ https://ad-signalio.github.io/helm-charts  →  secrets-configuration-aws
 ## Requirements
 
 - The ASCP addon, which `tf-dt-eks` installs
-- The `match` namespace, which this module creates by default. These secrets
+- The `var.namespace` namespace (`match` by default), which this module creates by default. These secrets
   have to exist before anything that consumes them, so it is usually first into
   the namespace. Set `create_namespace = false` if something else owns it —
   `tf-dt-keda` can, via `create_match_namespace`, though a scaling module is a
@@ -107,9 +112,9 @@ https://ad-signalio.github.io/helm-charts  →  secrets-configuration-aws
   same configuration without a `depends_on` deciding the order
 - Schedulable compute, if `wait` is left on — the syncer is a Deployment
 
-The chart hardcodes `namespace: match` in every template, so `var.namespace`
-only decides where the release record lives — it does not move the objects.
-Worth fixing upstream to use `.Release.Namespace`.
+Chart 0.1.0 hardcoded `namespace: match` in every template, so any other
+`var.namespace` failed with `namespaces "match" not found`. 0.2.0 uses
+`.Release.Namespace`; do not pin `chart_version` below it.
 
 ## Troubleshooting
 

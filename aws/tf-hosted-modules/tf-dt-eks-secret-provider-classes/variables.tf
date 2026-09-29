@@ -40,6 +40,18 @@ variable "smtp_secret_name" {
   default     = ""
 }
 
+variable "docker_secret_name" {
+  description = "Secrets Manager name of the hand-created Docker registry credentials. Must be one of tf-dt-eks's hand_created_secret_names, or the IRSA role cannot read it."
+  type        = string
+  default     = "match-docker-secret"
+}
+
+variable "honeybadger_secret_name" {
+  description = "Secrets Manager name of the hand-created Honeybadger API key. Must be one of tf-dt-eks's hand_created_secret_names, or the IRSA role cannot read it."
+  type        = string
+  default     = "match-honeybadger-secret"
+}
+
 variable "k8s_rds_pg_secret_name" {
   description = "Kubernetes Secret the Postgres credentials sync into. The match chart's postgres.*Secret values must match this."
   type        = string
@@ -47,7 +59,7 @@ variable "k8s_rds_pg_secret_name" {
 }
 
 variable "namespace" {
-  description = "Namespace holding the release record. The chart hardcodes \"match\" in its own templates, so this does not move the objects."
+  description = "Namespace the release and every object in it are created in. The platform chart uses \"snicketlabs\"."
   type        = string
   default     = "match"
 }
@@ -77,9 +89,9 @@ variable "chart_name" {
 }
 
 variable "chart_version" {
-  description = "Chart version."
+  description = "Chart version. 0.2.0 is the first that honours var.namespace and the Secret name inputs."
   type        = string
-  default     = "0.1.0"
+  default     = "0.2.0"
 }
 
 variable "release_name" {
@@ -98,4 +110,16 @@ variable "timeout" {
   description = "Seconds to wait for the release."
   type        = number
   default     = 600
+}
+
+variable "k8s_api_secret_name" {
+  description = "Kubernetes Secret the Rails secrets sync into. The platform chart uses \"api-secrets\"."
+  type        = string
+  default     = "match-api-secrets"
+}
+
+variable "k8s_owning_user_secret_name" {
+  description = "Kubernetes Secret the owning user password syncs into. The platform chart uses \"owning-user-credentials\"."
+  type        = string
+  default     = "match-owning-user-credentials"
 }
