@@ -21,8 +21,13 @@ resource "helm_release" "secrets_configuration" {
     userSecretName     = var.user_secret_name
     redisSecretName    = var.redis_secret_name
 
+    dockerSecretName      = var.docker_secret_name
+    honeybadgerSecretName = var.honeybadger_secret_name
+
     k8sSecretNames = {
       rdsPg = var.k8s_rds_pg_secret_name
+      api   = var.k8s_api_secret_name
+      user  = var.k8s_owning_user_secret_name
     }
 
     smtp = {
