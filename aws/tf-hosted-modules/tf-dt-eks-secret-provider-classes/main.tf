@@ -30,6 +30,10 @@ resource "helm_release" "secrets_configuration" {
       user  = var.k8s_owning_user_secret_name
     }
 
+    redis = {
+      enabled = var.redis_secret_name != ""
+    }
+
     smtp = {
       enabled        = var.smtp_secret_name != ""
       smtpSecretName = var.smtp_secret_name
@@ -40,4 +44,11 @@ resource "helm_release" "secrets_configuration" {
       image   = var.secret_syncer_image
     }
   })]
+
+  lifecycle {
+    precondition {
+      condition     = var.redis_secret_name != "" || !contains(["0.1.0", "0.2.0"], var.chart_version)
+      error_message = "An empty redis_secret_name needs chart_version 0.3.0 or later; earlier charts ignore redis.enabled and render a SecretProviderClass with no secret name."
+    }
+  }
 }

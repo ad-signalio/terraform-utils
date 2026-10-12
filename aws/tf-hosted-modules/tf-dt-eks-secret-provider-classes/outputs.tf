@@ -4,7 +4,7 @@ output "k8s_secret_names" {
     api         = var.k8s_api_secret_name
     owning_user = var.k8s_owning_user_secret_name
     rds_pg      = var.k8s_rds_pg_secret_name
-    redis       = "${var.cluster_name}-redis"
+    redis       = var.redis_secret_name != "" ? "${var.cluster_name}-redis" : null
     docker      = "dockerconfig"
     honeybadger = "honeybadger-api-key"
     smtp        = var.smtp_secret_name != "" ? "smtp-secrets" : null

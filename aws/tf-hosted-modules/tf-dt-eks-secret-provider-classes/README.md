@@ -35,7 +35,7 @@ module "secret_provider_classes" {
   api_secret_name    = module.application-secrets.api_secret_name
   user_secret_name   = module.application-secrets.user_secret_name
   rds_pg_secret_name = module.rds-postgres.rds_pg_secret_name
-  redis_secret_name  = module.elasticache_redis.redis_secret_name
+  redis_secret_name  = module.elasticache_redis.redis_secret_name # omit on GoodJob, see below
 
   depends_on = [module.eks_auto_mode_nodepool] # the syncer is a Deployment
 }
@@ -48,7 +48,7 @@ module "secret_provider_classes" {
 | `k8s_api_secret_name` (`match-api-secrets`) | `api_secret_name` — Rails keys |
 | `k8s_owning_user_secret_name` (`match-owning-user-credentials`) | `user_secret_name` |
 | `k8s_rds_pg_secret_name` (`match-postgres-credentials`) | `rds_pg_secret_name` |
-| `<cluster_name>-redis` | `redis_secret_name` |
+| `<cluster_name>-redis` | `redis_secret_name`, only when set |
 | `dockerconfig` | `docker_secret_name` (`match-docker-secret`), account-level |
 | `honeybadger-api-key` | `honeybadger_secret_name` (`match-honeybadger-secret`), account-level |
 | `smtp-secrets` | `smtp_secret_name`, only when set |
@@ -61,6 +61,17 @@ Defaults in brackets. The platform chart consumes `api-secrets`,
 The last two come from fixed, account-level Secrets Manager entries that
 **Terraform grants access to but never creates**. They have to exist before the
 release, or the syncer produces nothing for them.
+
+## Without Redis
+
+An application on GoodJob keeps its job queue in Postgres and has no Redis.
+Leave `redis_secret_name` unset and the Redis SecretProviderClass is not
+created, the same way an empty `smtp_secret_name` drops SMTP.
+
+That needs `chart_version` 0.3.0 or later: 0.2.0 and earlier have no
+`redis.enabled` value, so they would render a SecretProviderClass with an empty
+secret name and the syncer pod would never start. A precondition stops the plan
+before that happens.
 
 ## The interlock
 
@@ -98,8 +109,11 @@ The chart comes from the public helm repo, so no registry credentials are
 needed anywhere:
 
 ```
-https://ad-signalio.github.io/helm-charts  →  secrets-configuration-aws
+https://snicketlabs.github.io/helm-charts  →  secrets-configuration-aws
 ```
+
+`ad-signalio.github.io/helm-charts` serves the same 0.2.0 but nothing later:
+newer charts publish to `snicketlabs` only.
 
 ## Requirements
 
