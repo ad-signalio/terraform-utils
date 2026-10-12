@@ -30,8 +30,9 @@ variable "rds_pg_secret_name" {
 }
 
 variable "redis_secret_name" {
-  description = "Secrets Manager name holding the Redis URL. tf-dt-elasticache-redis output redis_secret_name."
+  description = "Secrets Manager name holding the Redis URL. tf-dt-elasticache-redis output redis_secret_name. Empty disables the Redis SecretProviderClass, for an application on GoodJob; needs chart_version 0.3.0 or later."
   type        = string
+  default     = ""
 }
 
 variable "smtp_secret_name" {
@@ -77,9 +78,9 @@ variable "secret_syncer_image" {
 }
 
 variable "chart_repository" {
-  description = "Helm repository serving the chart. Public, so no credentials are needed."
+  description = "Helm repository serving the chart. Public, so no credentials are needed. The ad-signalio repo stops at 0.2.0; newer charts publish to snicketlabs only."
   type        = string
-  default     = "https://ad-signalio.github.io/helm-charts"
+  default     = "https://snicketlabs.github.io/helm-charts"
 }
 
 variable "chart_name" {

@@ -1,13 +1,13 @@
 # tf-dt-external-secrets
 
 Installs the [External Secrets Operator](https://external-secrets.io/) (controller
-+ CRDs) via Helm - the operator that powers the GCP secrets path (sc-22517).
++ CRDs) via Helm - the operator that powers the GCP secrets path.
 Follows the `tf-dt-keda` pattern.
 
 This module installs **only the operator**. The `SecretStore` and `ExternalSecret`
 resources are deployed separately by the `secrets-configuration/eso-support` Helm
 chart, and the operator's Workload Identity binding is wired via
-`tf-dt-workload-identity` (sc-22516).
+`tf-dt-workload-identity`.
 
 Cloud-agnostic - ESO runs on any Kubernetes cluster (AWS/GCP/bare metal); the
 per-cloud difference lives in the `SecretStore`, not here.
