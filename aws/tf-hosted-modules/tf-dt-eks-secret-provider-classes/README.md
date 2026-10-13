@@ -68,10 +68,10 @@ An application on GoodJob keeps its job queue in Postgres and has no Redis.
 Leave `redis_secret_name` unset and the Redis SecretProviderClass is not
 created, the same way an empty `smtp_secret_name` drops SMTP.
 
-That needs `chart_version` 0.3.0 or later: 0.2.0 and earlier have no
-`redis.enabled` value, so they would render a SecretProviderClass with an empty
-secret name and the syncer pod would never start. A precondition stops the plan
-before that happens.
+That needs `chart_version` 0.3.0 or later, which is the default: 0.2.0 and
+earlier have no `redis.enabled` value, so they would render a SecretProviderClass
+with an empty secret name and the syncer pod would never start. A precondition
+stops the plan if an older version is pinned.
 
 ## The interlock
 

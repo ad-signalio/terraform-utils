@@ -90,9 +90,9 @@ variable "chart_name" {
 }
 
 variable "chart_version" {
-  description = "Chart version. 0.2.0 is the first that honours var.namespace and the Secret name inputs."
+  description = "Chart version. 0.2.0 is the first that honours var.namespace and the Secret name inputs; 0.3.0 is the first that can leave out Redis."
   type        = string
-  default     = "0.2.0"
+  default     = "0.3.0"
 }
 
 variable "release_name" {

@@ -35,10 +35,6 @@ run "redis_set_keeps_redis" {
 run "redis_unset_disables_redis" {
   command = plan
 
-  variables {
-    chart_version = "0.3.0"
-  }
-
   assert {
     condition     = yamldecode(helm_release.secrets_configuration[0].values[0]).redis.enabled == false
     error_message = "redis.enabled should be false when redis_secret_name is empty."
@@ -52,6 +48,10 @@ run "redis_unset_disables_redis" {
 
 run "redis_unset_on_old_chart_is_refused" {
   command = plan
+
+  variables {
+    chart_version = "0.2.0"
+  }
 
   expect_failures = [helm_release.secrets_configuration]
 }
