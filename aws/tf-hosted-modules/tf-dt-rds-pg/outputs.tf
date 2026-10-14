@@ -21,3 +21,8 @@ output "db_port" {
   description = "Port, for the chart's postgres.port."
   value       = module.db.db_instance_port
 }
+
+output "db_host" {
+  description = "Instance address, without the port. For the chart's kedaAutoScaling.postgres.host: KEDA needs the host as a literal at render time and cannot read it from the synced secret."
+  value       = module.db.db_instance_address
+}
