@@ -62,13 +62,13 @@ variable "secret_naming_convention" {
 variable "kubernetes_version" {
   description = "The Kubernetes version for the EKS cluster"
   type        = string
-  default     = "1.34"
+  default     = "1.36"
 }
 
 variable "ascp_addon_version" {
   description = "The version of the AWS Secrets Store CSI Driver Provider (ASCP) EKS add-on"
   type        = string
-  default     = "v3.1.0-eksbuild.1"
+  default     = "v3.1.3-eksbuild.1"
 }
 
 variable "use_auto_mode" {
