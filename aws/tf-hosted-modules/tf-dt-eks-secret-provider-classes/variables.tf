@@ -5,7 +5,7 @@ variable "enabled" {
 }
 
 variable "cluster_name" {
-  description = "EKS cluster name. Used to derive the Redis secret name the chart creates."
+  description = "EKS cluster name."
   type        = string
 }
 
@@ -27,12 +27,6 @@ variable "user_secret_name" {
 variable "rds_pg_secret_name" {
   description = "Secrets Manager name holding the Postgres credentials. tf-dt-rds-pg output rds_pg_secret_name."
   type        = string
-}
-
-variable "redis_secret_name" {
-  description = "Secrets Manager name holding the Redis URL. tf-dt-elasticache-redis output redis_secret_name. Empty disables the Redis SecretProviderClass, for an application on GoodJob; needs chart_version 0.3.0 or later."
-  type        = string
-  default     = ""
 }
 
 variable "smtp_secret_name" {
@@ -90,9 +84,9 @@ variable "chart_name" {
 }
 
 variable "chart_version" {
-  description = "Chart version. 0.2.0 is the first that honours var.namespace and the Secret name inputs; 0.3.0 is the first that can leave out Redis."
+  description = "Chart version. 0.4.0 or later: earlier charts still render a Redis SecretProviderClass."
   type        = string
-  default     = "0.3.0"
+  default     = "0.4.0"
 }
 
 variable "release_name" {

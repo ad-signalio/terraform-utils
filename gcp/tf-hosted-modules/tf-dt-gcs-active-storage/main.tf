@@ -82,7 +82,7 @@ resource "google_project_service" "secretmanager" {
 }
 
 # Stash the HMAC access_id + secret in Secret Manager so ESO can sync them into
-# the cluster (mirrors how tf-dt-memorystore/tf-dt-cloud-sql store connection
+# the cluster (mirrors how tf-dt-cloud-sql stores its connection
 # secrets). JSON {access_id, secret}; the secret is only retrievable at create.
 resource "google_secret_manager_secret" "hmac" {
   count     = var.create_hmac_key ? 1 : 0

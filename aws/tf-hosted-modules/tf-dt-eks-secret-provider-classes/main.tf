@@ -19,7 +19,6 @@ resource "helm_release" "secrets_configuration" {
     apiSecretName      = var.api_secret_name
     rdsPgSecretName    = var.rds_pg_secret_name
     userSecretName     = var.user_secret_name
-    redisSecretName    = var.redis_secret_name
 
     dockerSecretName      = var.docker_secret_name
     honeybadgerSecretName = var.honeybadger_secret_name
@@ -28,10 +27,6 @@ resource "helm_release" "secrets_configuration" {
       rdsPg = var.k8s_rds_pg_secret_name
       api   = var.k8s_api_secret_name
       user  = var.k8s_owning_user_secret_name
-    }
-
-    redis = {
-      enabled = var.redis_secret_name != ""
     }
 
     smtp = {
@@ -47,8 +42,8 @@ resource "helm_release" "secrets_configuration" {
 
   lifecycle {
     precondition {
-      condition     = var.redis_secret_name != "" || !contains(["0.1.0", "0.2.0"], var.chart_version)
-      error_message = "An empty redis_secret_name needs chart_version 0.3.0 or later; earlier charts ignore redis.enabled and render a SecretProviderClass with no secret name."
+      condition     = !contains(["0.1.0", "0.2.0", "0.3.0"], var.chart_version)
+      error_message = "chart_version must be 0.4.0 or later. Earlier charts render a Redis SecretProviderClass that this module no longer gives a secret name, so the syncer pod never starts."
     }
   }
 }

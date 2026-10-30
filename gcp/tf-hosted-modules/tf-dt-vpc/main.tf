@@ -136,7 +136,7 @@ resource "google_compute_firewall" "allow_control_plane" {
 }
 
 # --- Private Service Access: reserve a range and peer it to Google-managed
-# services so Cloud SQL / Memorystore can get private IPs.
+# services so Cloud SQL can get private IPs.
 # Kept as raw resources (the network module's PSA submodule exposes no outputs)
 # so we can surface the range name + connection id below. ---
 # The global address uses network_self_link (always the project-ID self-link)
