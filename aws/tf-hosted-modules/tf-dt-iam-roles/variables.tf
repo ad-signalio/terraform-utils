@@ -51,3 +51,9 @@ variable "ingest_buckets" {
   type        = list(string)
   default     = []
 }
+
+variable "allow_s3_ingest_role_assumption" {
+  description = "Whether the platform may assume S3 ingest roles in other AWS accounts. Required for ingest sources that use cross-account IAM role assumption with an external ID; the application feature is unusable without it. Never permits assuming a role in this account."
+  type        = bool
+  default     = true
+}
