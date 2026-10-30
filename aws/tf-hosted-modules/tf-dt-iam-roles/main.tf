@@ -51,6 +51,38 @@ data "aws_iam_policy_document" "ingest_s3" {
   }
 }
 
+# Cross-account S3 ingest: lets the platform assume a role that a content
+# provider creates in THEIR AWS account, scoped by an external ID the platform
+# issues. AWS's
+# recommended pattern for third-party access.
+#
+# The wildcard grants the right to attempt, not to succeed: an assumption only
+# works if the target role's trust policy names this role and the external ID
+# matches, which is the provider's consent expressed in their own account. The
+# explicit deny closes the self-escalation path - an explicit deny always wins,
+# so this role can never assume anything in this account even if some role here
+# trusts the account root broadly.
+#
+# Note the deny is forward-constraining: a future in-account role chaining need
+# would hit it and require a deliberate carve-out by exact ARN.
+data "aws_iam_policy_document" "s3_ingest_assume_role" {
+  count = var.allow_s3_ingest_role_assumption ? 1 : 0
+
+  statement {
+    sid       = "AssumeContentProviderIngestRoles"
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = ["arn:aws:iam::*:role/*"]
+  }
+
+  statement {
+    sid       = "NeverAssumeInThisAccount"
+    effect    = "Deny"
+    actions   = ["sts:AssumeRole"]
+    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*"]
+  }
+}
+
 #AUTO-INGEST POLICY
 data "aws_iam_policy_document" "sas_service_account_autoingest" {
   statement {
@@ -259,4 +291,20 @@ resource "aws_iam_policy" "sas_service_account_autoingest" {
   policy      = data.aws_iam_policy_document.sas_service_account_autoingest.json
 
   tags = var.tags
+}
+
+resource "aws_iam_policy" "s3_ingest_assume_role" {
+  count = var.allow_s3_ingest_role_assumption ? 1 : 0
+
+  name_prefix = "${local.name}-s3-ingest-assume-role"
+  description = "Lets the platform assume S3 ingest roles in other AWS accounts, never in this one"
+  policy      = data.aws_iam_policy_document.s3_ingest_assume_role[0].json
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "s3_ingest_assume_role" {
+  count      = var.allow_s3_ingest_role_assumption ? 1 : 0
+  role       = module.iam_assumable_role_with_oidc.iam_role_name
+  policy_arn = aws_iam_policy.s3_ingest_assume_role[0].arn
 }
