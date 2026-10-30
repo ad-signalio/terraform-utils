@@ -46,7 +46,6 @@
 | <a name="input_organisation_name"></a> [organisation\_name](#input\_organisation\_name) | Name of the initial Org to use match | `string` | n/a | yes |
 | <a name="input_owning_user_email"></a> [owning\_user\_email](#input\_owning\_user\_email) | Email of the Admin user to access Match. | `string` | n/a | yes |
 | <a name="input_rds_pg_secret_name"></a> [rds\_pg\_secret\_name](#input\_rds\_pg\_secret\_name) | Name of the AWS Secrets Manager secret for RDS Postgres. | `string` | n/a | yes |
-| <a name="input_redis_secret_name"></a> [redis\_secret\_name](#input\_redis\_secret\_name) | Name of the AWS Secrets Manager secret for Redis. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"us-east-1"` | no |
 | <a name="input_root_domain_name"></a> [root\_domain\_name](#input\_root\_domain\_name) | Root domain name for certificate lookup | `string` | n/a | yes |
 | <a name="input_secret_store_role_arn"></a> [secret\_store\_role\_arn](#input\_secret\_store\_role\_arn) | ARN of the IAM Role for Secret Store | `string` | n/a | yes |

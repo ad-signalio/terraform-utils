@@ -44,6 +44,6 @@ output "psa_range_name" {
 }
 
 output "private_vpc_connection" {
-  description = "Service networking connection ID (depend on this from Cloud SQL / Memorystore to ensure peering exists first)."
+  description = "Service networking connection ID (depend on this from Cloud SQL to ensure peering exists first)."
   value       = google_service_networking_connection.psa.id
 }

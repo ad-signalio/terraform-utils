@@ -32,7 +32,7 @@ variable "services_cidr" {
 }
 
 variable "psa_prefix_length" {
-  description = "Prefix length of the Private Service Access range reserved for Google-managed services (Cloud SQL, Memorystore private IP)."
+  description = "Prefix length of the Private Service Access range reserved for Google-managed services (Cloud SQL private IP)."
   type        = number
   default     = 16
 }

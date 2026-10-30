@@ -6,7 +6,7 @@ holds credentials of its own.
 ## Why
 
 Terraform already creates every secret the application needs — Rails keys, the
-owning user password, RDS and Redis credentials — and `tf-dt-eks` already
+owning user password and RDS credentials — and `tf-dt-eks` already
 installs the ASCP addon that can read them. What was missing was the piece in
 between: the `SecretProviderClass` objects that map a Secrets Manager entry onto
 a Kubernetes Secret.
@@ -35,7 +35,6 @@ module "secret_provider_classes" {
   api_secret_name    = module.application-secrets.api_secret_name
   user_secret_name   = module.application-secrets.user_secret_name
   rds_pg_secret_name = module.rds-postgres.rds_pg_secret_name
-  redis_secret_name  = module.elasticache_redis.redis_secret_name # omit on GoodJob, see below
 
   depends_on = [module.eks_auto_mode_nodepool] # the syncer is a Deployment
 }
@@ -48,7 +47,6 @@ module "secret_provider_classes" {
 | `k8s_api_secret_name` (`match-api-secrets`) | `api_secret_name` — Rails keys |
 | `k8s_owning_user_secret_name` (`match-owning-user-credentials`) | `user_secret_name` |
 | `k8s_rds_pg_secret_name` (`match-postgres-credentials`) | `rds_pg_secret_name` |
-| `<cluster_name>-redis` | `redis_secret_name`, only when set |
 | `dockerconfig` | `docker_secret_name` (`match-docker-secret`), account-level |
 | `honeybadger-api-key` | `honeybadger_secret_name` (`match-honeybadger-secret`), account-level |
 | `smtp-secrets` | `smtp_secret_name`, only when set |
@@ -62,16 +60,12 @@ The last two come from fixed, account-level Secrets Manager entries that
 **Terraform grants access to but never creates**. They have to exist before the
 release, or the syncer produces nothing for them.
 
-## Without Redis
+## Chart version
 
-An application on GoodJob keeps its job queue in Postgres and has no Redis.
-Leave `redis_secret_name` unset and the Redis SecretProviderClass is not
-created, the same way an empty `smtp_secret_name` drops SMTP.
-
-That needs `chart_version` 0.3.0 or later, which is the default: 0.2.0 and
-earlier have no `redis.enabled` value, so they would render a SecretProviderClass
-with an empty secret name and the syncer pod would never start. A precondition
-stops the plan if an older version is pinned.
+The module needs `chart_version` 0.4.0 or later, which is the default. Earlier
+charts still render a Redis SecretProviderClass, and the module gives it no
+secret name, so the syncer pod would never start. A precondition stops the plan
+if an older version is pinned.
 
 ## The interlock
 
@@ -128,7 +122,7 @@ newer charts publish to `snicketlabs` only.
 
 Chart 0.1.0 hardcoded `namespace: match` in every template, so any other
 `var.namespace` failed with `namespaces "match" not found`. 0.2.0 uses
-`.Release.Namespace`; do not pin `chart_version` below it.
+`.Release.Namespace`. Both are below the 0.4.0 floor anyway.
 
 ## Troubleshooting
 

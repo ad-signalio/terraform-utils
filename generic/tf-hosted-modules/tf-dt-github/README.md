@@ -42,7 +42,6 @@ No modules.
 | <a name="input_organisation_name"></a> [organisation\_name](#input\_organisation\_name) | Name of the initial Org to use match | `string` | n/a | yes |
 | <a name="input_owning_user_email"></a> [owning\_user\_email](#input\_owning\_user\_email) | Email of the Admin user to access Match. | `string` | n/a | yes |
 | <a name="input_rds_pg_secret_name"></a> [rds\_pg\_secret\_name](#input\_rds\_pg\_secret\_name) | Name of the AWS Secrets Manager secret for RDS Postgres. | `string` | n/a | yes |
-| <a name="input_redis_secret_name"></a> [redis\_secret\_name](#input\_redis\_secret\_name) | Name of the AWS Secrets Manager secret for Redis. | `string` | n/a | yes |
 | <a name="input_secret_store_role_arn"></a> [secret\_store\_role\_arn](#input\_secret\_store\_role\_arn) | ARN of the IAM Role for Secret Store | `string` | n/a | yes |
 | <a name="input_smtp_secret_name"></a> [smtp\_secret\_name](#input\_smtp\_secret\_name) | Name of the AWS Secrets Manager secret for SMTP. | `string` | n/a | yes |
 | <a name="input_user_secret_name"></a> [user\_secret\_name](#input\_user\_secret\_name) | Name of the AWS Secrets Manager secret for user credentials. | `string` | n/a | yes |
