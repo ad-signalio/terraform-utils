@@ -65,6 +65,12 @@ variable "kubernetes_version" {
   default     = "1.36"
 }
 
+variable "enabled_log_types" {
+  description = "EKS control-plane log types to send to CloudWatch."
+  type        = list(string)
+  default     = ["api", "audit", "authenticator", "scheduler"]
+}
+
 variable "ascp_addon_version" {
   description = "The version of the AWS Secrets Store CSI Driver Provider (ASCP) EKS add-on"
   type        = string

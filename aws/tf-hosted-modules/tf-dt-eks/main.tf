@@ -131,7 +131,7 @@ module "eks_al2023_cluster" {
   endpoint_private_access                = true
   endpoint_public_access                 = true
   ip_family                              = "ipv4"
-  enabled_log_types                      = ["api", "audit", "authenticator", "scheduler"]
+  enabled_log_types                      = var.enabled_log_types
   cloudwatch_log_group_retention_in_days = 30
 
   create_auto_mode_iam_resources = true
