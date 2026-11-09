@@ -35,14 +35,27 @@ variable "env_region" {
   }
 }
 
+variable "env_class" {
+  description = "OPTIONAL. What the environment is for, emitted as the as-env-class tag: poc (proof of concept or demo, counted in POC cost reporting), customer (a paying customer's environment) or internal (our own). Null omits the tag."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.env_class == null || contains(["poc", "customer", "internal"], coalesce(var.env_class, "unset"))
+    error_message = "env_class must be one of 'poc', 'customer', 'internal', or null."
+  }
+}
+
 locals {
   name = join("-", compact([var.env_use, var.env_id, var.env_additional_id, var.env_region]))
-  tags = {
-    product     = "match-${var.env_id}"
-    product-use = local.name
-    as-env-use  = var.env_use
-    as-cust-id  = var.env_id
-  }
+  tags = merge(
+    {
+      product     = "match-${var.env_id}"
+      product-use = local.name
+      as-env-use  = var.env_use
+      as-cust-id  = var.env_id
+    },
+    var.env_class == null ? {} : { as-env-class = var.env_class },
+  )
 }
 
 output "env_name" {

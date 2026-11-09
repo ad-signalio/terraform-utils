@@ -51,6 +51,18 @@ A location id of the county/region the cloud region (or DC) the environment is i
 | us1   | us-east-1   | East US       | n/a |
 | us2  | us-west-2   | West US       | n/a |
 
+#### Environment Class (tag only)
+
+Optional `env_class`, emitted as the `as-env-class` tag. It is not part of the
+name. POC cost reporting finds POCs by `as-env-class=poc`, so set it on every
+POC or demo environment. Leave it null to omit the tag.
+
+| Value    | Usage
+|----------|-------
+| poc      | Proof of concept or demo environment, counted in POC cost reporting
+| customer | A paying customer's environment
+| internal | Our own environment (testing, sandboxes, MVPs)
+
 Examples:
 
 Production Dedicated Single Tenancy AWS Hosted Environment for AMC Hosted on AWS in us-east-1.
@@ -79,7 +91,9 @@ test-snicket-us1
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+| ---- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
 
 ## Providers
 
@@ -98,6 +112,7 @@ No resources.
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_env_additional_id"></a> [env\_additional\_id](#input\_env\_additional\_id) | An OPTIONAL additional identifier to be appended after the first Identifier - should mostly not be used. Limited to 5 characters. | `string` | `""` | no |
+| <a name="input_env_class"></a> [env\_class](#input\_env\_class) | OPTIONAL. What the environment is for, emitted as the as-env-class tag: poc (proof of concept or demo, counted in POC cost reporting), customer (a paying customer's environment) or internal (our own). Null omits the tag. | `string` | `null` | no |
 | <a name="input_env_id"></a> [env\_id](#input\_env\_id) | The unique ID such as customer or use for an environment name, eg bigcorp, mediaorg, adsignal or snicket. Limited to 12 characters. | `string` | n/a | yes |
 | <a name="input_env_region"></a> [env\_region](#input\_env\_region) | The region (e.g., us1, eu1, ap1) | `string` | n/a | yes |
 | <a name="input_env_use"></a> [env\_use](#input\_env\_use) | The environment type (e.g., prod, test, uat, sbox) | `string` | n/a | yes |
