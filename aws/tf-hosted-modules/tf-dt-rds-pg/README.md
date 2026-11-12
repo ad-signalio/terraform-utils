@@ -46,6 +46,7 @@
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in | `string` | `"Mon:00:00-Mon:03:00"` | no |
 | <a name="input_max_allocated_storage"></a> [max\_allocated\_storage](#input\_max\_allocated\_storage) | The maximume allocated storage in GBs | `number` | `150` | no |
 | <a name="input_minimal_db_config"></a> [minimal\_db\_config](#input\_minimal\_db\_config) | When true, disables multi-AZ and overrides instance\_class to db.m5.xlarge. Intended for test and internal load test environments to reduce RDS costs. | `bool` | `false` | no |
+| <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | Run a Multi-AZ standby. null keeps the old behaviour (on, unless minimal\_db\_config). Set false for internal and PoC environments that do not need the standby. | `bool` | `null` | no |
 | <a name="input_parameter_group_family"></a> [parameter\_group\_family](#input\_parameter\_group\_family) | The Postgres parameter group family | `string` | `"postgres17"` | no |
 | <a name="input_parameters"></a> [parameters](#input\_parameters) | A list of DB parameter group parameters to apply | <pre>list(object({<br/>    name  = string<br/>    value = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Whether to enable Performance Insights | `bool` | `false` | no |
