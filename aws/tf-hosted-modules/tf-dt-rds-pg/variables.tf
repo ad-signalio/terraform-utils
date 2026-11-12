@@ -117,6 +117,12 @@ variable "minimal_db_config" {
   default     = false
 }
 
+variable "multi_az" {
+  description = "Run a Multi-AZ standby. null keeps the old behaviour (on, unless minimal_db_config). Set false for internal and PoC environments that do not need the standby."
+  type        = bool
+  default     = null
+}
+
 variable "db_name" {
   description = "Name of the initial database. Not \"match\" - it is reserved in RDS Postgres. Changing this on an existing instance replaces it."
   type        = string
