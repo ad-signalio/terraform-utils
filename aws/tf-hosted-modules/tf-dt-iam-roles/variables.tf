@@ -35,6 +35,12 @@ variable "kubernetes_service_account" {
   type        = string
 }
 
+variable "grafana_kubernetes_service_account" {
+  description = "Service account Grafana runs under. Its own, not the application's: the application role carries the s3-ingest-assume-role policy, whose in-account Deny on sts:AssumeRole beats any allow and stops Grafana reaching the CloudWatch role."
+  type        = string
+  default     = "grafana"
+}
+
 variable "domain_name" {
   description = "Names of domain name to associate with the load balancer if on route53"
   type        = string
