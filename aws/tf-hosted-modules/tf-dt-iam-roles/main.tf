@@ -186,6 +186,25 @@ data "aws_iam_policy_document" "grafana_cloudwatch" {
     resources = ["*"]
   }
 
+  # The datasource health check runs a logs query as well as a metrics one and
+  # fails if either does, so without these the datasource stays ERROR on an
+  # otherwise working role -- a missing allow this time, not the ingest deny.
+  statement {
+    sid    = "AllowReadingLogsFromCloudWatch"
+    effect = "Allow"
+
+    actions = [
+      "logs:DescribeLogGroups",
+      "logs:GetLogGroupFields",
+      "logs:StartQuery",
+      "logs:StopQuery",
+      "logs:GetQueryResults",
+      "logs:GetLogEvents",
+    ]
+
+    resources = ["*"]
+  }
+
   statement {
     sid    = "AllowReadingResourcesForTags"
     effect = "Allow"
@@ -217,6 +236,12 @@ resource "aws_iam_policy" "grafana_cloudwatch" {
   tags = var.tags
 }
 
+# Two principals, not one. The Grafana role is the one that works: the
+# application role is attached s3_ingest_assume_role, whose in-account Deny on
+# sts:AssumeRole covers every role here including this one, and an explicit deny
+# beats the allow on both sides. It stays listed so an environment still running
+# Grafana under the application service account is no worse off than before --
+# drop it on the next major, once every consumer has moved.
 resource "aws_iam_role" "grafana_cloudwatch" {
   name = "${local.name}-grafana-cloudwatch"
   assume_role_policy = jsonencode({
@@ -225,7 +250,10 @@ resource "aws_iam_role" "grafana_cloudwatch" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = module.iam_assumable_role_with_oidc.iam_role_arn
+          AWS = [
+            module.iam_assumable_role_with_oidc.iam_role_arn,
+            module.grafana_iam_assumable_role_with_oidc.iam_role_arn,
+          ]
         }
         Action = "sts:AssumeRole"
       }
@@ -238,6 +266,57 @@ resource "aws_iam_role" "grafana_cloudwatch" {
 resource "aws_iam_role_policy_attachment" "grafana_cloudwatch_attach" {
   role       = aws_iam_role.grafana_cloudwatch.name
   policy_arn = aws_iam_policy.grafana_cloudwatch.arn
+}
+
+# Grafana's own identity. Separate from the application's so it inherits none of
+# its permissions -- it reads CloudWatch and nothing else. sc-25626 took the
+# application's Postgres user away from Grafana for the same reason.
+#
+# The role grants only the hop to grafana_cloudwatch; that role holds the actual
+# CloudWatch, EC2, tag and Performance Insights reads. Keeping the hop rather
+# than attaching those directly is what lets the Helm chart stay as it is: its
+# CloudWatch datasource is authType: assume_role and requires an assumeRoleArn.
+module "grafana_iam_assumable_role_with_oidc" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version = "~> 5.0"
+
+  create_role = true
+
+  role_name        = "${local.name}-grafana"
+  role_description = "IAM role for the Grafana Kubernetes service account"
+
+  provider_url = var.oidc_issuer_url
+
+  oidc_fully_qualified_subjects  = ["system:serviceaccount:${var.kubernetes_namespace}:${var.grafana_kubernetes_service_account}"]
+  oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
+
+  tags = var.tags
+}
+
+data "aws_iam_policy_document" "grafana_assume_cloudwatch" {
+  statement {
+    sid       = "AssumeGrafanaCloudWatchRole"
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = [aws_iam_role.grafana_cloudwatch.arn]
+  }
+}
+
+resource "aws_iam_policy" "grafana_assume_cloudwatch" {
+  name_prefix = "${local.name}-grafana-assume-cloudwatch-"
+  description = "Lets Grafana assume the role that reads CloudWatch"
+  policy      = data.aws_iam_policy_document.grafana_assume_cloudwatch.json
+
+  tags = var.tags
+}
+
+# Attached here rather than through the module's role_policy_arns: that input
+# would make the Grafana role depend on this policy, the policy depends on
+# grafana_cloudwatch, and grafana_cloudwatch's trust depends on the Grafana
+# role. A cycle. The attachment runs after all three exist and breaks it.
+resource "aws_iam_role_policy_attachment" "grafana_assume_cloudwatch" {
+  role       = module.grafana_iam_assumable_role_with_oidc.iam_role_name
+  policy_arn = aws_iam_policy.grafana_assume_cloudwatch.arn
 }
 
 module "iam_assumable_role_with_oidc" {

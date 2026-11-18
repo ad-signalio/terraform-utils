@@ -16,21 +16,25 @@
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
+| <a name="module_grafana_iam_assumable_role_with_oidc"></a> [grafana\_iam\_assumable\_role\_with\_oidc](#module\_grafana\_iam\_assumable\_role\_with\_oidc) | terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc | ~> 5.0 |
 | <a name="module_iam_assumable_role_with_oidc"></a> [iam\_assumable\_role\_with\_oidc](#module\_iam\_assumable\_role\_with\_oidc) | terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc | ~> 5.0 |
 
 ## Resources
 
 | Name | Type |
 | ---- | ---- |
+| [aws_iam_policy.grafana_assume_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.ingest_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.s3_ingest_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.s3_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.sas_service_account_autoingest](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.grafana_assume_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.grafana_cloudwatch_attach](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.s3_ingest_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.grafana_assume_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.ingest_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.s3_ingest_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -46,6 +50,7 @@
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
 | <a name="input_ingest_buckets"></a> [ingest\_buckets](#input\_ingest\_buckets) | Buckets this environment ingests customer content FROM. Not created or owned by this stack, unlike s3\_bucket\_name, so they are granted through their own policy that can be narrowed or detached independently. Names, not ARNs. | `list(string)` | `[]` | no |
 | <a name="input_kubernetes_namespace"></a> [kubernetes\_namespace](#input\_kubernetes\_namespace) | Kubernetes namespace for the service account | `string` | `"default"` | no |
+| <a name="input_grafana_kubernetes_service_account"></a> [grafana\_kubernetes\_service\_account](#input\_grafana\_kubernetes\_service\_account) | Service account Grafana runs under. Its own, not the application's: the application role carries the s3-ingest-assume-role policy, whose in-account Deny on sts:AssumeRole beats any allow and stops Grafana reaching the CloudWatch role. | `string` | `"grafana"` | no |
 | <a name="input_kubernetes_service_account"></a> [kubernetes\_service\_account](#input\_kubernetes\_service\_account) | Name of the Kubernetes service account | `string` | n/a | yes |
 | <a name="input_oidc_issuer_url"></a> [oidc\_issuer\_url](#input\_oidc\_issuer\_url) | OIDC issuer URL of the EKS cluster | `string` | n/a | yes |
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | ARN of the OIDC provider for the EKS cluster | `string` | n/a | yes |
@@ -57,6 +62,8 @@
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_grafana_cloudwatch_role_arn"></a> [grafana\_cloudwatch\_role\_arn](#output\_grafana\_cloudwatch\_role\_arn) | ARN of the role Grafana assumes to read CloudWatch, for monitoring.awsDashboards.cloudwatch.assumeRoleArn. Created by this module already; it just had no way to be discovered. |
+| <a name="output_grafana_role_arn"></a> [grafana\_role\_arn](#output\_grafana\_role\_arn) | ARN of Grafana's own IRSA role, for the eks.amazonaws.com/role-arn annotation on the Grafana service account. |
+| <a name="output_grafana_role_name"></a> [grafana\_role\_name](#output\_grafana\_role\_name) | n/a |
 | <a name="output_role_arn"></a> [role\_arn](#output\_role\_arn) | n/a |
 | <a name="output_role_name"></a> [role\_name](#output\_role\_name) | n/a |
 <!-- END_TF_DOCS -->
