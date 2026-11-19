@@ -8,8 +8,9 @@ configured for Workload Identity and private nodes.
 ## What it creates
 
 - **`terraform-google-modules/.../private-cluster`** (`~> 44.0`) - a GKE Standard,
-  VPC-native cluster with private nodes, one autoscaling node pool, and a
-  dedicated least-privilege node service account.
+  VPC-native cluster with private nodes, an autoscaling default node pool (plus
+  any `additional_node_pools`), and a dedicated least-privilege node service
+  account.
 - **`google_project_service`** - enables `container` + `compute`
   (`disable_on_destroy = false`, same convention as tf-dt-vpc).
 
@@ -20,6 +21,33 @@ configured for Workload Identity and private nodes.
   falls back to the node SA.
 - **`cloud-platform` oauth scope** on the pool - required for the WI token exchange.
 - **Dedicated node SA** (`create_service_account = true`) - not the default compute SA.
+
+## Node pools
+
+The default pool has one fixed `machine_type`. A pod cannot span nodes, so a pod
+whose CPU or memory request exceeds what one default-pool node can allocate stays
+`Pending` however far the pool scales out. Add a larger pool for those pods with
+`additional_node_pools`; at `min_node_count = 0` (the default) it costs nothing
+until such a pod is pending.
+
+```hcl
+  additional_node_pools = [
+    {
+      name           = "large"
+      machine_type   = "e2-standard-16"
+      max_node_count = 1 # per zone for regional clusters
+      taints = [
+        { key = "dedicated", value = "large", effect = "NO_SCHEDULE" }
+      ]
+    }
+  ]
+```
+
+**Taint a pool you mean for specific workloads**, and give those workloads a
+matching toleration. Untainted, the cluster autoscaler treats it as general
+capacity. On a test cluster an untainted `e2-standard-16` pool was scaled up by
+GKE's own system pods at cluster creation, a `kube-system` pod stayed on it
+afterwards, and the autoscaler removed a cheaper default-pool node before it.
 
 ## Endpoint exposure
 
@@ -62,35 +90,37 @@ Terraform kubernetes & helm providers in the environment.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 7.17.0, < 8 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 7.35.0 |
+| ---- | ------- |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 7.17.0, < 8 |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_gke"></a> [gke](#module\_gke) | terraform-google-modules/kubernetes-engine/google//modules/private-cluster | ~> 44.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [google_project_service.required](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | Extra node pools alongside the default pool. Node counts are per zone for<br/>regional clusters. Use one to schedule pods whose CPU or memory request is<br/>larger than a default-pool node can allocate; with min\_node\_count = 0 it<br/>costs nothing until such a pod is pending. taints are optional: without one,<br/>other pods may also land on these nodes once they exist. | <pre>list(object({<br/>    name           = string<br/>    machine_type   = string<br/>    min_node_count = optional(number, 0)<br/>    max_node_count = number<br/>    labels         = optional(map(string), {})<br/>    taints = optional(list(object({<br/>      key    = string<br/>      value  = string<br/>      effect = string<br/>    })), [])<br/>  }))</pre> | `[]` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the GKE cluster. | `string` | n/a | yes |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | Block Terraform from destroying the cluster. Default false for reference/test environments. | `bool` | `false` | no |
-| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | If true, the control-plane endpoint is private-only (no public endpoint) - requires VPN/bastion/IAP for kubectl/Terraform k8s providers to reach it. Default false keeps a public endpoint (lock it down with master\_authorized\_networks); nodes are private either way. | `bool` | `false` | no |
+| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | If true, the control-plane endpoint is private-only (no public endpoint) — requires VPN/bastion/IAP for kubectl/Terraform k8s providers to reach it. Default false keeps a public endpoint (lock it down with master\_authorized\_networks); nodes are private either way. | `bool` | `false` | no |
+| <a name="input_gateway_api_channel"></a> [gateway\_api\_channel](#input\_gateway\_api\_channel) | Gateway API channel for the cluster. null = disabled. CHANNEL\_STANDARD installs the Gateway API CRDs and the GKE managed GatewayClasses (gke-l7-global-external-managed, gke-l7-regional-external-managed, etc.). | `string` | `null` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Machine type for the default node pool. | `string` | `"e2-standard-4"` | no |
 | <a name="input_master_authorized_networks"></a> [master\_authorized\_networks](#input\_master\_authorized\_networks) | CIDRs allowed to reach the (public) control-plane endpoint. List of objects { cidr\_block, display\_name }. Empty = no restriction. | `list(object({ cidr_block = string, display_name = string }))` | `[]` | no |
 | <a name="input_master_ipv4_cidr_block"></a> [master\_ipv4\_cidr\_block](#input\_master\_ipv4\_cidr\_block) | Private control-plane /28 CIDR. Must not overlap the VPC subnet/pod/service ranges or any peered network. Pass the same value to tf-dt-vpc control\_plane\_cidr to open the webhook firewall. | `string` | `"172.16.0.0/28"` | no |
@@ -100,7 +130,7 @@ Terraform kubernetes & helm providers in the environment.
 | <a name="input_pods_range_name"></a> [pods\_range\_name](#input\_pods\_range\_name) | Secondary range name for pods (tf-dt-vpc output pods\_range\_name). | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID the cluster is created in. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Region for the cluster (and for the regional control plane / node pools). | `string` | n/a | yes |
-| <a name="input_regional"></a> [regional](#input\_regional) | If true, a regional cluster (control plane + nodes across zones). If false, a zonal cluster - set zones to a single zone. | `bool` | `true` | no |
+| <a name="input_regional"></a> [regional](#input\_regional) | If true, a regional cluster (control plane + nodes across zones). If false, a zonal cluster — set zones to a single zone. | `bool` | `true` | no |
 | <a name="input_release_channel"></a> [release\_channel](#input\_release\_channel) | GKE release channel (RAPID, REGULAR, STABLE). | `string` | `"REGULAR"` | no |
 | <a name="input_services_range_name"></a> [services\_range\_name](#input\_services\_range\_name) | Secondary range name for services (tf-dt-vpc output services\_range\_name). | `string` | n/a | yes |
 | <a name="input_subnetwork"></a> [subnetwork](#input\_subnetwork) | Node subnet name (tf-dt-vpc output subnet\_name). | `string` | n/a | yes |
@@ -109,7 +139,7 @@ Terraform kubernetes & helm providers in the environment.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_cluster_ca_certificate"></a> [cluster\_ca\_certificate](#output\_cluster\_ca\_certificate) | Base64 cluster CA certificate (for the Terraform kubernetes/helm providers). |
 | <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | Cluster API endpoint (for the Terraform kubernetes/helm providers). |
 | <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | GKE cluster name. |
