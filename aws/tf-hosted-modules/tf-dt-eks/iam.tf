@@ -7,25 +7,6 @@ locals {
   oidc_provider_arn = "arn:aws:iam::${local.account_id}:oidc-provider/oidc.eks.${local.region}.amazonaws.com/id/${local.oidc_id}"
 }
 
-module "efs_csi_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "~> 6.2.1"
-
-  attach_efs_csi_policy = true
-
-  name            = "${local.name}-role-efs"
-  policy_name     = "${local.name}-role-efs"
-  use_name_prefix = false
-
-  oidc_providers = {
-    main = {
-      provider_arn               = local.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:efs-csi-controller-sa", "kube-system:efs-csi-node-sa"]
-    }
-  }
-  tags = var.tags
-}
-
 module "ebs_csi_irsa" {
   count   = var.use_auto_mode ? 0 : 1
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"

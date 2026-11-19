@@ -60,10 +60,9 @@ locals {
   # in a later apply than the cluster itself. Callers in that position set
   # create_compute_dependent_addons = false for the apply that creates the
   # cluster, and leave it at the default afterwards.
+  #
+  # No aws-efs-csi-driver: this module does not support EFS. See README.
   compute_dependent_add_ons = {
-    aws-efs-csi-driver = {
-      service_account_role_arn = module.efs_csi_irsa.arn
-    }
     metrics-server = {}
   }
 
@@ -97,9 +96,6 @@ locals {
       before_compute              = true
       resolve_conflicts_on_create = "OVERWRITE"
       resolve_conflicts_on_update = "OVERWRITE"
-    }
-    aws-efs-csi-driver = {
-      service_account_role_arn = module.efs_csi_irsa.arn
     }
     aws-ebs-csi-driver = {}
     aws-secrets-store-csi-driver-provider = {
@@ -159,16 +155,6 @@ module "eks_al2023_cluster" {
   tags                      = var.tags
   cloudwatch_log_group_tags = var.tags
 
-  node_security_group_additional_rules = {
-    ingress_nfs_vpc = {
-      description = "Allow NFS ingress from VPC CIDR for EFS"
-      protocol    = "tcp"
-      from_port   = 2049
-      to_port     = 2049
-      type        = "ingress"
-      cidr_blocks = [var.vpc_cidr_block]
-    }
-  }
 }
 
 
