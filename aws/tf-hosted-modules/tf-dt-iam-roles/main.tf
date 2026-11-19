@@ -236,12 +236,6 @@ resource "aws_iam_policy" "grafana_cloudwatch" {
   tags = var.tags
 }
 
-# Two principals, not one. The Grafana role is the one that works: the
-# application role is attached s3_ingest_assume_role, whose in-account Deny on
-# sts:AssumeRole covers every role here including this one, and an explicit deny
-# beats the allow on both sides. It stays listed so an environment still running
-# Grafana under the application service account is no worse off than before --
-# drop it on the next major, once every consumer has moved.
 resource "aws_iam_role" "grafana_cloudwatch" {
   name = "${local.name}-grafana-cloudwatch"
   assume_role_policy = jsonencode({
@@ -250,10 +244,7 @@ resource "aws_iam_role" "grafana_cloudwatch" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = [
-            module.iam_assumable_role_with_oidc.iam_role_arn,
-            module.grafana_iam_assumable_role_with_oidc.iam_role_arn,
-          ]
+          AWS = module.grafana_iam_assumable_role_with_oidc.iam_role_arn
         }
         Action = "sts:AssumeRole"
       }
