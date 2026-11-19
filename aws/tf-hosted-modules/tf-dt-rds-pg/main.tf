@@ -49,7 +49,8 @@ module "db" {
   password                             = random_password.db_password.result
   manage_master_user_password_rotation = false
 
-  multi_az = var.multi_az != null ? var.multi_az : !var.minimal_db_config
+  multi_az          = var.multi_az != null ? var.multi_az : !var.minimal_db_config
+  availability_zone = var.availability_zone
 
   tags = var.tags
 
