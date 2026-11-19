@@ -123,6 +123,12 @@ variable "multi_az" {
   default     = null
 }
 
+variable "availability_zone" {
+  description = "AZ for a single-AZ instance, e.g. to keep the DB in the same AZ as the nodes. Requires multi_az = false: AWS rejects it on a Multi-AZ instance. null lets AWS pick. Changing it on an existing instance replaces the instance, so set it to the AZ the instance is already in."
+  type        = string
+  default     = null
+}
+
 variable "db_name" {
   description = "Name of the initial database. Not \"match\" - it is reserved in RDS Postgres. Changing this on an existing instance replaces it."
   type        = string

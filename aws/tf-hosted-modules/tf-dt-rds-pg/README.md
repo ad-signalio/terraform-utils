@@ -33,6 +33,7 @@
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_allocated_storage"></a> [allocated\_storage](#input\_allocated\_storage) | The allocated storage in GBs | `number` | `50` | no |
+| <a name="input_availability_zone"></a> [availability\_zone](#input\_availability\_zone) | AZ for a single-AZ instance, e.g. to keep the DB in the same AZ as the nodes. Requires multi\_az = false: AWS rejects it on a Multi-AZ instance. null lets AWS pick. Changing it on an existing instance replaces the instance, so set it to the AZ the instance is already in. | `string` | `null` | no |
 | <a name="input_backup_retention_period"></a> [backup\_retention\_period](#input\_backup\_retention\_period) | The days to retain backups for | `number` | `30` | no |
 | <a name="input_backup_window"></a> [backup\_window](#input\_backup\_window) | The daily time range during which automated backups are created if automated backups are enabled | `string` | `"03:00-06:00"` | no |
 | <a name="input_create_aws_secret"></a> [create\_aws\_secret](#input\_create\_aws\_secret) | Create a secret with the rds config to AWS Secrets Manager | `bool` | `true` | no |
