@@ -57,16 +57,42 @@ module "gke" {
   # it disabled. The upstream module only renders gateway_api_config when non-null.
   gateway_api_channel = var.gateway_api_channel
 
-  node_pools = [
-    {
-      name         = "default"
-      machine_type = var.machine_type
-      min_count    = var.min_node_count
-      max_count    = var.max_node_count
-      auto_repair  = true
-      auto_upgrade = true
-    }
-  ]
+  # The default pool, plus any additional pools. A single fixed machine type
+  # cannot serve both small workers and pods whose CPU request exceeds one node's
+  # allocatable (a pod never spans nodes), so callers can add a larger pool that
+  # scales from zero. node_metadata and the oauth scopes below apply to every pool.
+  node_pools = concat(
+    [
+      {
+        name         = "default"
+        machine_type = var.machine_type
+        min_count    = var.min_node_count
+        max_count    = var.max_node_count
+        auto_repair  = true
+        auto_upgrade = true
+      }
+    ],
+    [
+      for pool in var.additional_node_pools : {
+        name         = pool.name
+        machine_type = pool.machine_type
+        min_count    = pool.min_node_count
+        max_count    = pool.max_node_count
+        auto_repair  = true
+        auto_upgrade = true
+      }
+    ]
+  )
+
+  node_pools_labels = merge(
+    { all = {} },
+    { for pool in var.additional_node_pools : pool.name => pool.labels }
+  )
+
+  node_pools_taints = merge(
+    { all = [] },
+    { for pool in var.additional_node_pools : pool.name => pool.taints }
+  )
 
   # cloud-platform scope is required for the Workload Identity token exchange.
   node_pools_oauth_scopes = {

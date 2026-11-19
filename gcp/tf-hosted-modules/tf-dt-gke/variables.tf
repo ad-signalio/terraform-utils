@@ -89,6 +89,48 @@ variable "max_node_count" {
   default     = 3
 }
 
+variable "additional_node_pools" {
+  description = <<-EOT
+    Extra node pools alongside the default pool. Node counts are per zone for
+    regional clusters. Use one to schedule pods whose CPU or memory request is
+    larger than a default-pool node can allocate; with min_node_count = 0 it
+    costs nothing until such a pod is pending. taints are optional: without one,
+    other pods may also land on these nodes once they exist.
+  EOT
+  type = list(object({
+    name           = string
+    machine_type   = string
+    min_node_count = optional(number, 0)
+    max_node_count = number
+    labels         = optional(map(string), {})
+    taints = optional(list(object({
+      key    = string
+      value  = string
+      effect = string
+    })), [])
+  }))
+  default = []
+
+  validation {
+    condition     = alltrue([for p in var.additional_node_pools : p.name != "default"])
+    error_message = "additional_node_pools: \"default\" is reserved for the default pool."
+  }
+
+  validation {
+    condition     = length(distinct([for p in var.additional_node_pools : p.name])) == length(var.additional_node_pools)
+    error_message = "additional_node_pools: names must be unique."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for p in var.additional_node_pools : [
+        for t in p.taints : contains(["NO_SCHEDULE", "PREFER_NO_SCHEDULE", "NO_EXECUTE"], t.effect)
+      ]
+    ]))
+    error_message = "additional_node_pools: taint effect must be NO_SCHEDULE, PREFER_NO_SCHEDULE or NO_EXECUTE."
+  }
+}
+
 variable "release_channel" {
   description = "GKE release channel (RAPID, REGULAR, STABLE)."
   type        = string
