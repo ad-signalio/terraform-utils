@@ -63,3 +63,9 @@ variable "allow_s3_ingest_role_assumption" {
   type        = bool
   default     = true
 }
+
+variable "allow_autoingest" {
+  description = "Whether the platform may provision AutoIngest resources: S3 buckets, SNS topics and IAM users with access keys, all named *-autoingest*. Not typically enabled on client-hosted systems: leave it off unless the client has asked for AutoIngest. It lets the application create IAM users and attach inline policies to them in the client's account. POC environments generally enable it."
+  type        = bool
+  default     = false
+}
