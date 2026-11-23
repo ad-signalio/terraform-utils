@@ -19,3 +19,8 @@ output "grafana_role_arn" {
 output "grafana_role_name" {
   value = module.grafana_iam_assumable_role_with_oidc.iam_role_name
 }
+
+output "autoingest_enabled" {
+  description = "Whether the platform role has AutoIngest permissions. Feed this to the chart so the application hides AutoIngest when it can't provision it."
+  value       = var.allow_autoingest
+}

@@ -85,6 +85,8 @@ data "aws_iam_policy_document" "s3_ingest_assume_role" {
 
 #AUTO-INGEST POLICY
 data "aws_iam_policy_document" "sas_service_account_autoingest" {
+  count = var.allow_autoingest ? 1 : 0
+
   statement {
     sid    = "AllowAppUserToCreateAutoIngestS3BucketsButNotToDeleteThemOrTheirContent"
     effect = "Allow"
@@ -110,15 +112,24 @@ data "aws_iam_policy_document" "sas_service_account_autoingest" {
     ]
   }
 
+  # Topics are named <bucket>-events, i.e. *-autoingest-events. The ":*" form
+  # covers subscription ARNs (topic ARN plus ":<id>") in case Unsubscribe is
+  # authorised against the subscription rather than the topic.
   statement {
-    sid    = "AllowAppUserToCreateAutoIngestSNS"
+    sid    = "AllowAppUserToManageAutoIngestSNSTopics"
     effect = "Allow"
 
     actions = [
-      "sns:*"
+      "sns:CreateTopic",
+      "sns:TagResource",
+      "sns:SetTopicAttributes",
+      "sns:Subscribe",
+      "sns:Unsubscribe",
+      "sns:DeleteTopic",
     ]
     resources = [
-      "*",
+      "arn:aws:sns:*:${data.aws_caller_identity.current.account_id}:${local.autoingest_s3_bucket_name}-events",
+      "arn:aws:sns:*:${data.aws_caller_identity.current.account_id}:${local.autoingest_s3_bucket_name}-events:*",
     ]
   }
 
@@ -128,6 +139,7 @@ data "aws_iam_policy_document" "sas_service_account_autoingest" {
 
     actions = [
       "iam:CreateUser",
+      "iam:GetUser",
       "iam:DeleteUser",
       "iam:CreateAccessKey",
       "iam:DeleteAccessKey",
@@ -140,18 +152,6 @@ data "aws_iam_policy_document" "sas_service_account_autoingest" {
     ]
     resources = [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${local.autoingest_s3_bucket_name}",
-    ]
-  }
-  statement {
-    sid    = "AllowAppUserToGetUsers"
-    effect = "Allow"
-
-    actions = [
-      "iam:ListUsers",
-      "iam:GetUser",
-    ]
-    resources = [
-      "*",
     ]
   }
 }
@@ -321,15 +321,10 @@ module "iam_assumable_role_with_oidc" {
 
   provider_url = var.oidc_issuer_url
 
-  role_policy_arns = concat([
-    aws_iam_policy.s3_policy.arn,
-    aws_iam_policy.sas_service_account_autoingest.arn,
-    ],
-    # Splat rather than a conditional: yields [] when there are no ingest
-    # buckets, and keeps the list length known at plan time, which the
-    # assumable-role module requires.
-    aws_iam_policy.ingest_s3[*].arn,
-  )
+  # Attachments are managed below as named resources instead. The upstream
+  # module indexes role_policy_arns by position (count), so making one policy
+  # conditional would shift the others and force them to be replaced.
+  role_policy_arns = []
 
   oidc_fully_qualified_subjects  = ["system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"]
   oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
@@ -356,9 +351,11 @@ resource "aws_iam_policy" "ingest_s3" {
 }
 
 resource "aws_iam_policy" "sas_service_account_autoingest" {
+  count = var.allow_autoingest ? 1 : 0
+
   name_prefix = "${local.name}-sas-autoingest-policy"
   description = "SAS service account policy for autoingest with S3, SNS, and IAM permissions"
-  policy      = data.aws_iam_policy_document.sas_service_account_autoingest.json
+  policy      = data.aws_iam_policy_document.sas_service_account_autoingest[0].json
 
   tags = var.tags
 }
@@ -377,4 +374,45 @@ resource "aws_iam_role_policy_attachment" "s3_ingest_assume_role" {
   count      = var.allow_s3_ingest_role_assumption ? 1 : 0
   role       = module.iam_assumable_role_with_oidc.iam_role_name
   policy_arn = aws_iam_policy.s3_ingest_assume_role[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "s3_policy" {
+  role       = module.iam_assumable_role_with_oidc.iam_role_name
+  policy_arn = aws_iam_policy.s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "sas_service_account_autoingest" {
+  count      = var.allow_autoingest ? 1 : 0
+  role       = module.iam_assumable_role_with_oidc.iam_role_name
+  policy_arn = aws_iam_policy.sas_service_account_autoingest[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "ingest_s3" {
+  count      = length(var.ingest_buckets) > 0 ? 1 : 0
+  role       = module.iam_assumable_role_with_oidc.iam_role_name
+  policy_arn = aws_iam_policy.ingest_s3[0].arn
+}
+
+# Adopt the attachments the role module used to create from role_policy_arns,
+# whose order was [s3_policy, autoingest, ingest_s3...], so existing
+# environments don't detach and reattach them. When allow_autoingest is false
+# the autoingest attachment is moved and then destroyed: only detached.
+moved {
+  from = module.iam_assumable_role_with_oidc.aws_iam_role_policy_attachment.custom[0]
+  to   = aws_iam_role_policy_attachment.s3_policy
+}
+
+moved {
+  from = module.iam_assumable_role_with_oidc.aws_iam_role_policy_attachment.custom[1]
+  to   = aws_iam_role_policy_attachment.sas_service_account_autoingest[0]
+}
+
+moved {
+  from = module.iam_assumable_role_with_oidc.aws_iam_role_policy_attachment.custom[2]
+  to   = aws_iam_role_policy_attachment.ingest_s3[0]
+}
+
+moved {
+  from = aws_iam_policy.sas_service_account_autoingest
+  to   = aws_iam_policy.sas_service_account_autoingest[0]
 }
