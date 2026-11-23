@@ -5,7 +5,7 @@ variable "env_name" {
   validation {
     # 64-char IAM role name cap minus the longest suffix iam.tf appends (-secrets-role, 13 chars).
     condition     = length(var.env_name) <= 51
-    error_message = "env_name must be 51 characters or fewer: efs_csi_irsa/ebs_csi_irsa/secrets_csi_irsa build IAM role names from it (e.g. \"${var.env_name}-secrets-role\"), and AWS IAM role names cap at 64 characters."
+    error_message = "env_name must be 51 characters or fewer: ebs_csi_irsa/secrets_csi_irsa build IAM role names from it (e.g. \"${var.env_name}-secrets-role\"), and AWS IAM role names cap at 64 characters."
   }
 }
 
@@ -39,8 +39,9 @@ variable "vpc_id" {
 }
 
 variable "vpc_cidr_block" {
-  description = "The CIDR block of the VPC"
+  description = "Unused. Fed the NFS ingress rule for EFS, which this module no longer creates. Kept, and made optional, so existing callers that pass it do not break; safe to stop passing."
   type        = string
+  default     = null
 }
 
 variable "private_subnet_ids" {
@@ -91,7 +92,7 @@ variable "enable_cluster_creator_admin_permissions" {
 variable "create_compute_dependent_addons" {
   description = <<-DESC
     Create the addons that need compute before terraform will consider them
-    healthy: metrics-server and aws-efs-csi-driver, both Deployments.
+    healthy: metrics-server, a Deployment.
 
     Set false for the apply that creates the cluster when compute comes from
     custom node pools. Those are Kubernetes CRDs, so they cannot be planned

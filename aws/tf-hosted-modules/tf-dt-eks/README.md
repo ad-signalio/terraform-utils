@@ -1,3 +1,14 @@
+# tf-dt-eks
+
+**No EFS support from this version on.** The EFS CSI driver add-on, its IRSA
+role (`<env>-role-efs`) and the NFS ingress rule on the node security group
+have been removed. A cluster that mounts EFS must stay pinned to the previous
+tag. Bumping it deletes the driver's IAM role and takes the add-on out of
+EKS's management; the upstream `preserve = true` default leaves the driver
+running, but without credentials, so new EFS volumes stop provisioning.
+Existing data is not touched -- the filesystem is managed by `tf-dt-efs`, not
+here.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -17,7 +28,6 @@
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_ebs_csi_irsa"></a> [ebs\_csi\_irsa](#module\_ebs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
-| <a name="module_efs_csi_irsa"></a> [efs\_csi\_irsa](#module\_efs\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 | <a name="module_eks_al2023_cluster"></a> [eks\_al2023\_cluster](#module\_eks\_al2023\_cluster) | terraform-aws-modules/eks/aws | ~> 21.15.1 |
 | <a name="module_secrets_csi_irsa"></a> [secrets\_csi\_irsa](#module\_secrets\_csi\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts | ~> 6.2.1 |
 
@@ -37,7 +47,7 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_access_entries"></a> [access\_entries](#input\_access\_entries) | Map of extra Cluster access entries. See terraform-aws-modules/eks/aws for details. | `map(any)` | `{}` | no |
 | <a name="input_ascp_addon_version"></a> [ascp\_addon\_version](#input\_ascp\_addon\_version) | The version of the AWS Secrets Store CSI Driver Provider (ASCP) EKS add-on | `string` | `"v3.1.3-eksbuild.1"` | no |
-| <a name="input_create_compute_dependent_addons"></a> [create\_compute\_dependent\_addons](#input\_create\_compute\_dependent\_addons) | Create the addons that need compute before terraform will consider them<br/>healthy: metrics-server and aws-efs-csi-driver, both Deployments.<br/><br/>Set false for the apply that creates the cluster when compute comes from<br/>custom node pools. Those are Kubernetes CRDs, so they cannot be planned<br/>until the cluster exists, which means they land in a later apply -- and<br/>these addons would otherwise sit DEGRADED with<br/>InsufficientNumberOfReplicas until the addon create timeout, failing that<br/>first apply. Leave at the default for every apply after it.<br/><br/>Only consulted under use\_auto\_mode. With managed node groups the upstream<br/>module already orders addons after the node groups. | `bool` | `true` | no |
+| <a name="input_create_compute_dependent_addons"></a> [create\_compute\_dependent\_addons](#input\_create\_compute\_dependent\_addons) | Create the addons that need compute before terraform will consider them<br/>healthy: metrics-server, a Deployment.<br/><br/>Set false for the apply that creates the cluster when compute comes from<br/>custom node pools. Those are Kubernetes CRDs, so they cannot be planned<br/>until the cluster exists, which means they land in a later apply -- and<br/>these addons would otherwise sit DEGRADED with<br/>InsufficientNumberOfReplicas until the addon create timeout, failing that<br/>first apply. Leave at the default for every apply after it.<br/><br/>Only consulted under use\_auto\_mode. With managed node groups the upstream<br/>module already orders addons after the node groups. | `bool` | `true` | no |
 | <a name="input_enable_cluster_creator_admin_permissions"></a> [enable\_cluster\_creator\_admin\_permissions](#input\_enable\_cluster\_creator\_admin\_permissions) | Whether to grant admin permissions to the user who creates the cluster. Default is true. | `bool` | `false` | no |
 | <a name="input_enabled_log_types"></a> [enabled\_log\_types](#input\_enabled\_log\_types) | EKS control-plane log types to send to CloudWatch. | `list(string)` | <pre>[<br>  "api",<br>  "audit",<br>  "authenticator",<br>  "scheduler"<br>]</pre> | no |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | The environment name (e.g., sbox-adsignal-shared-us1) | `string` | n/a | yes |
@@ -52,7 +62,7 @@
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | `{}` | no |
 | <a name="input_use_auto_mode"></a> [use\_auto\_mode](#input\_use\_auto\_mode) | Choose to use, EKS Auto Mode. Default is true. If false, `node_count` and `node_instance_type` variables will be used to create a managed node group with specified count and instance type. | `bool` | `true` | no |
 | <a name="input_use_builtin_node_pools"></a> [use\_builtin\_node\_pools](#input\_use\_builtin\_node\_pools) | Use EKS Auto Mode's built-in "system" and "general-purpose" node pools.<br/><br/>Set false when supplying custom node pools -- notably to get tags onto compute,<br/>which the built-in pools cannot do: they use the default NodeClass, which<br/>carries no tags. See the tf-dt-eks-auto-mode-nodepool module.<br/><br/>When false, this module creates the EC2 access entry the node IAM role needs,<br/>because EKS only manages node access automatically for the built-in pools. | `bool` | `false` | no |
-| <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block of the VPC | `string` | n/a | yes |
+| <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | Unused. Fed the NFS ingress rule for EFS, which this module no longer creates. Kept, and made optional, so existing callers that pass it do not break; safe to stop passing. | `string` | `null` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC where the EKS cluster will be deployed | `string` | n/a | yes |
 
 ## Outputs
